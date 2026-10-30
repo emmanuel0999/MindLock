@@ -1,0 +1,74 @@
+/* PANTALLA 6: Nivel completado */
+
+.resultado-cabecera {
+    align-items: center;
+    padding-top: 12px;
+}
+
+.resultado-candado {
+    width: 140px;
+    height: 140px;
+    border-radius: 70px;
+    background-color: var(--color-acento-suave);
+    border-width: 3px;
+    border-color: var(--color-borde);
+    align-items: center;
+    justify-content: center;
+    scale: 0.7 0.7;
+    transition-property: scale, border-color;
+    transition-duration: 0.45s, 0.3s;
+    transition-timing-function: ease-out-back, linear;
+}
+
+.resultado-candado--abierto {
+    scale: 1 1;
+    border-color: var(--color-acento);
+}
+
+.destello {
+    position: absolute;
+    width: 10px;
+    height: 10px;
+    border-radius: 5px;
+    background-color: var(--color-acento);
+    opacity: 0;
+    scale: 0.2 0.2;
+    transition-property: opacity, scale;
+    transition-duration: 0.5s, 0.5s;
+}
+
+.destello--1 { top: -8px; left: 18px; }
+.destello--2 { top: 6px; right: -10px; width: 14px; height: 14px; border-radius: 7px; }
+.destello--3 { bottom: 0; left: -12px; width: 8px; height: 8px; border-radius: 4px; }
+.destello--4 { bottom: -10px; right: 22px; }
+
+.resultado-candado--abierto .destello {
+    opacity: 1;
+    scale: 1 1;
+}
+
+/* Estrellas: aparecen una por una */
+.estrella-resultado {
+    margin: 0 6px;
+    color: var(--color-tenue);
+    opacity: 0;
+    scale: 0.3 0.3;
+    transition-property: opacity, scale;
+    transition-duration: 0.3s, 0.35s;
+    transition-timing-function: linear, ease-out-back;
+}
+
+.estrella-resultado--centro {
+    width: 64px;
+    height: 64px;
+    margin-bottom: 14px;
+}
+
+.estrella-resultado--visible {
+    opacity: 1;
+    scale: 1 1;
+}
+
+.estrella-resultado--llena {
+    color: var(--color-acento);
+}

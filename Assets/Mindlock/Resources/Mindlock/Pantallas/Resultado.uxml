@@ -1,0 +1,80 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" editor-extension-mode="False">
+    <!-- PANTALLA 6: Nivel completado -->
+    <ui:VisualElement name="pantallaResultado" class="pantalla">
+
+        <ui:ScrollView name="scrollResultado" class="crecer">
+
+            <ui:VisualElement class="resultado-cabecera">
+                <!-- Candado que se abre -->
+                <ui:VisualElement name="candadoResultado" class="resultado-candado">
+                    <ui:VisualElement class="destello destello--1" />
+                    <ui:VisualElement class="destello destello--2" />
+                    <ui:VisualElement class="destello destello--3" />
+                    <ui:VisualElement class="destello destello--4" />
+                    <ui:VisualElement name="icoResultado" class="ico ico-candado ico-xxl color-acento" />
+                </ui:VisualElement>
+
+                <ui:Label name="lblTituloResultado" text="¡Nivel 15 completado!" class="titulo centrar-texto mt-md" />
+
+                <!-- Estrellas -->
+                <ui:VisualElement class="fila centro mt-md">
+                    <ui:VisualElement name="estrella1" class="ico ico-estrella ico-xl estrella-resultado" />
+                    <ui:VisualElement name="estrella2" class="ico ico-estrella ico-xl estrella-resultado estrella-resultado--centro" />
+                    <ui:VisualElement name="estrella3" class="ico ico-estrella ico-xl estrella-resultado" />
+                </ui:VisualElement>
+
+                <ui:Label name="lblPuntajeResultado" text="650 pts" class="numero-grande mt-sm" />
+                <ui:Label name="insigniaRecord" text="¡Nuevo récord!" class="pastilla pastilla--acento mt-xs oculto" />
+            </ui:VisualElement>
+
+            <!-- Desglose -->
+            <ui:VisualElement class="tarjeta mt-lg">
+                <ui:VisualElement class="fila-dato">
+                    <ui:Label text="Puntaje base" class="texto-sec" />
+                    <ui:Label name="lblBase" text="1 000" class="negrita" />
+                </ui:VisualElement>
+                <ui:VisualElement class="fila-dato">
+                    <ui:Label name="lblTiempoNombre" text="Tiempo (1:24)" class="texto-sec" />
+                    <ui:Label name="lblDescTiempo" text="-200" class="negrita texto-error" />
+                </ui:VisualElement>
+                <ui:VisualElement class="fila-dato">
+                    <ui:Label name="lblIntentosNombre" text="Intentos (3)" class="texto-sec" />
+                    <ui:Label name="lblDescIntentos" text="-50" class="negrita texto-error" />
+                </ui:VisualElement>
+                <ui:VisualElement class="fila-dato fila-dato--ultima">
+                    <ui:Label name="lblPistasNombre" text="Pistas usadas (1)" class="texto-sec" />
+                    <ui:Label name="lblDescPistas" text="-100" class="negrita texto-error" />
+                </ui:VisualElement>
+                <ui:VisualElement class="fila-dato fila-dato--ultima fila-dato--total">
+                    <ui:Label text="Total" class="negrita" />
+                    <ui:Label name="lblTotal" text="650" class="negrita texto-acento" />
+                </ui:VisualElement>
+            </ui:VisualElement>
+
+            <!-- Avisos -->
+            <ui:VisualElement name="avisoDesbloqueo" class="aviso mt-md">
+                <ui:VisualElement class="ico ico-candado-abierto ico-md color-accion" />
+                <ui:Label name="lblDesbloqueo" text="Nivel 16 desbloqueado" class="aviso__texto texto-accion" />
+            </ui:VisualElement>
+            <ui:VisualElement name="avisoPista" class="aviso aviso--acento mt-sm oculto">
+                <ui:VisualElement class="ico ico-bombilla ico-md color-acento" />
+                <ui:Label text="¡3 estrellas! Ganaste una pista extra" class="aviso__texto texto-acento" />
+            </ui:VisualElement>
+
+        </ui:ScrollView>
+
+        <!-- Botones -->
+        <ui:Button name="botonSiguiente" text="Siguiente nivel" class="boton boton-principal mt-md" />
+        <ui:VisualElement class="fila mt-sm">
+            <ui:Button name="botonRepetir" class="boton boton-suave crecer mr-sm">
+                <ui:VisualElement class="ico ico-repetir ico-md" picking-mode="Ignore" />
+                <ui:Label text="Repetir" class="boton__texto" picking-mode="Ignore" />
+            </ui:Button>
+            <ui:Button name="botonMapaResultado" class="boton boton-suave crecer ml-sm">
+                <ui:VisualElement class="ico ico-mapa ico-md" picking-mode="Ignore" />
+                <ui:Label text="Mapa" class="boton__texto" picking-mode="Ignore" />
+            </ui:Button>
+        </ui:VisualElement>
+
+    </ui:VisualElement>
+</ui:UXML>

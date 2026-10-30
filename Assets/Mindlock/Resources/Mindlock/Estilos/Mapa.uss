@@ -1,0 +1,149 @@
+/* PANTALLA 2: Mapa de niveles */
+
+.tarjeta-diario {
+    flex-direction: row;
+    align-items: center;
+    margin: 0;
+    padding: 14px 16px;
+    min-height: 84px;
+    border-radius: var(--radio);
+    border-width: 2px;
+    border-color: var(--color-acento);
+    background-color: var(--color-acento-suave);
+    color: var(--color-texto);
+    transition-property: scale;
+    transition-duration: 0.12s;
+}
+
+.tarjeta-diario:active { scale: 0.98 0.98; }
+
+.tarjeta-diario__icono {
+    width: 48px;
+    height: 48px;
+    border-radius: 14px;
+    background-color: var(--color-acento);
+    align-items: center;
+    justify-content: center;
+}
+
+/* Contenedor de nodos: su "color" se usa para dibujar el camino punteado */
+.contenedor-niveles {
+    margin-top: 12px;
+    padding-bottom: 24px;
+    color: var(--color-texto-sec);
+}
+
+.seccion-niveles {
+    flex-direction: row;
+    align-items: center;
+    margin-top: 20px;
+    margin-bottom: 4px;
+    padding: 8px 12px;
+    border-radius: 12px;
+    background-color: var(--color-superficie);
+    border-width: 1px;
+    border-color: var(--color-borde);
+}
+
+.seccion-niveles__punto {
+    width: 12px;
+    height: 12px;
+    border-radius: 6px;
+    margin-right: 8px;
+}
+
+.seccion-niveles__titulo {
+    font-size: var(--fuente-md);
+    -unity-font-style: bold;
+}
+
+/* Fila con un nodo; el nodo se mueve en zigzag con "left" */
+.fila-nodo {
+    height: 118px;
+}
+
+.nodo-col {
+    position: absolute;
+    top: 10px;
+    width: 110px;
+    align-items: center;
+    translate: -50% 0;
+}
+
+.nodo {
+    width: 64px;
+    height: 64px;
+    margin: 0;
+    padding: 0;
+    border-radius: 32px;
+    border-width: 3px;
+    align-items: center;
+    justify-content: center;
+    transition-property: scale;
+    transition-duration: 0.45s;
+    transition-timing-function: ease-in-out-sine;
+}
+
+.nodo:active { scale: 0.92 0.92; }
+
+.nodo__numero {
+    font-size: var(--fuente-lg);
+    -unity-font-style: bold;
+    -unity-text-align: middle-center;
+}
+
+.nodo--completado {
+    background-color: var(--color-acento);
+    border-color: var(--color-acento-suave);
+    color: var(--color-sobre-acento);
+}
+
+.nodo--completado .nodo__numero { color: var(--color-sobre-acento); }
+
+.nodo--desbloqueado {
+    width: 76px;
+    height: 76px;
+    border-radius: 38px;
+    border-width: 6px;
+    background-color: var(--color-accion);
+    border-color: var(--color-accion-suave);
+    color: var(--color-sobre-accion);
+}
+
+.nodo--desbloqueado .nodo__numero {
+    color: var(--color-sobre-accion);
+    font-size: var(--fuente-xl);
+}
+
+.nodo--pulso { scale: 1.1 1.1; }
+
+.nodo--bloqueado {
+    background-color: var(--color-superficie);
+    border-color: var(--color-borde);
+    color: var(--color-tenue);
+}
+
+/* Insignia de candado abierto sobre los nodos completados */
+.nodo__insignia {
+    position: absolute;
+    top: -6px;
+    right: -6px;
+    width: 24px;
+    height: 24px;
+    border-radius: 12px;
+    background-color: var(--color-fondo);
+    border-width: 2px;
+    border-color: var(--color-acento);
+    align-items: center;
+    justify-content: center;
+}
+
+.nodo__puntaje {
+    margin-top: 2px;
+    font-size: var(--fuente-xs);
+    color: var(--color-texto-sec);
+    -unity-text-align: middle-center;
+    white-space: nowrap;
+}
+
+.nodo__puntaje--tenue { color: var(--color-tenue); }

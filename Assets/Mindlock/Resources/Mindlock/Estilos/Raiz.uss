@@ -1,0 +1,70 @@
+/* Contenedor principal, barra de navegación inferior y aviso emergente */
+
+.barra-navegacion {
+    flex-direction: row;
+    height: 68px;
+    padding: 0 8px;
+    background-color: var(--color-superficie);
+    border-top-width: 1px;
+    border-color: var(--color-borde);
+}
+
+.tab {
+    flex-grow: 1;
+    flex-basis: 0;
+    margin: 0;
+    padding: 0;
+    border-width: 0;
+    background-color: rgba(0, 0, 0, 0);
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    color: var(--color-texto-sec);
+}
+
+.tab__texto {
+    margin-top: 4px;
+    font-size: var(--fuente-xs);
+    -unity-font-style: bold;
+    color: var(--color-texto-sec);
+    -unity-text-align: middle-center;
+}
+
+.tab--activa { color: var(--color-accion); }
+.tab--activa .tab__texto { color: var(--color-accion); }
+
+/* ---------- Aviso emergente (logros y mensajes) ---------- */
+
+.toast {
+    position: absolute;
+    left: 16px;
+    right: 16px;
+    top: 12px;
+    flex-direction: row;
+    align-items: center;
+    padding: 12px 14px;
+    border-radius: 16px;
+    background-color: var(--color-superficie);
+    border-width: 2px;
+    border-color: var(--color-acento);
+    translate: 0 -180px;
+    opacity: 0;
+    transition-property: translate, opacity;
+    transition-duration: 0.3s, 0.3s;
+    transition-timing-function: ease-out-back, linear;
+}
+
+.toast--visible {
+    translate: 0 0;
+    opacity: 1;
+}
+
+.toast__icono {
+    width: 46px;
+    height: 46px;
+    border-radius: 23px;
+    background-color: var(--color-acento-suave);
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}

@@ -1,0 +1,272 @@
+/* PANTALLA 3: Vista de acertijo (incluye modal de pista, error y modo diario) */
+
+.juego-etiquetas {
+    align-items: flex-end;
+    min-width: 44px;
+}
+
+.banner-juego-diario {
+    flex-direction: row;
+    align-items: center;
+    padding: 10px 12px;
+    border-radius: 14px;
+    border-width: 1px;
+    border-color: var(--color-acento);
+    background-color: var(--color-acento-suave);
+}
+
+/* ---------- Indicadores ---------- */
+
+.indicadores {
+    flex-direction: row;
+}
+
+.indicador {
+    flex-grow: 1;
+    flex-basis: 0;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    min-height: 40px;
+    margin-right: 6px;
+    border-radius: 12px;
+    background-color: var(--color-superficie);
+    border-width: 1px;
+    border-color: var(--color-borde);
+    color: var(--color-texto-sec);
+}
+
+.indicador--puntos {
+    margin-right: 0;
+    color: var(--color-acento);
+}
+
+.indicador__valor {
+    margin-left: 6px;
+    font-size: var(--fuente-sm);
+    -unity-font-style: bold;
+    white-space: nowrap;
+}
+
+.indicador--puntos .indicador__valor { color: var(--color-acento); }
+
+.indicador--alerta {
+    border-color: var(--color-error);
+    background-color: var(--color-error-suave);
+    color: var(--color-error);
+}
+
+.indicador--alerta .indicador__valor { color: var(--color-error); }
+
+/* ---------- Enunciado ---------- */
+
+.tarjeta-enunciado {
+    padding: 22px 20px;
+    min-height: 140px;
+    justify-content: center;
+    border-width: 2px;
+    transition-property: border-color, background-color;
+    transition-duration: 0.25s, 0.25s;
+}
+
+.tarjeta-enunciado--correcta {
+    border-color: var(--color-exito);
+    background-color: var(--color-exito-suave);
+}
+
+.enunciado {
+    font-size: var(--fuente-lg);
+    -unity-font-style: bold;
+    -unity-text-align: middle-center;
+}
+
+.pista-vista {
+    flex-direction: row;
+    align-items: flex-start;
+    margin-top: 8px;
+    padding: 10px 12px;
+    border-radius: 12px;
+    background-color: var(--color-acento-suave);
+    color: var(--color-acento);
+}
+
+.pista-vista__texto {
+    margin-left: 8px;
+    font-size: var(--fuente-sm);
+    flex-shrink: 1;
+}
+
+.zona-respuesta {
+    margin-top: 16px;
+}
+
+/* ---------- Opción múltiple ---------- */
+
+.opcion {
+    flex-direction: row;
+    align-items: center;
+    margin: 0 0 10px 0;
+    padding: 12px 14px;
+    min-height: 60px;
+    border-radius: 14px;
+    border-width: 2px;
+    border-color: var(--color-borde);
+    background-color: var(--color-superficie);
+    color: var(--color-texto);
+    transition-property: border-color, background-color, scale;
+    transition-duration: 0.15s, 0.15s, 0.12s;
+}
+
+.opcion:active { scale: 0.98 0.98; }
+
+.opcion__letra {
+    width: 32px;
+    height: 32px;
+    border-radius: 16px;
+    background-color: var(--color-superficie-2);
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.opcion__letra-texto {
+    font-size: var(--fuente-sm);
+    -unity-font-style: bold;
+    -unity-text-align: middle-center;
+}
+
+.opcion__texto {
+    margin-left: 12px;
+    font-size: var(--fuente-md);
+    -unity-font-style: bold;
+    flex-shrink: 1;
+}
+
+.opcion--elegida {
+    border-color: var(--color-accion);
+    background-color: var(--color-accion-suave);
+}
+
+.opcion--elegida .opcion__letra { background-color: var(--color-accion); }
+.opcion--elegida .opcion__letra-texto { color: var(--color-sobre-accion); }
+
+.opcion--error {
+    border-color: var(--color-error);
+    background-color: var(--color-error-suave);
+}
+
+/* ---------- Secuencia ---------- */
+
+.casillas {
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.casilla {
+    min-width: 64px;
+    height: 64px;
+    margin: 4px;
+    padding: 0 10px;
+    border-radius: 14px;
+    border-width: 2px;
+    border-color: var(--color-texto-sec);
+    background-color: var(--color-fondo);
+    color: var(--color-texto-sec);
+    font-size: var(--fuente-xl);
+    -unity-font-style: bold;
+    -unity-text-align: middle-center;
+}
+
+.casilla--llena {
+    border-color: var(--color-accion);
+    background-color: var(--color-accion-suave);
+    color: var(--color-texto);
+}
+
+.fichas {
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.ficha {
+    min-width: 56px;
+    height: 52px;
+    margin: 5px;
+    padding: 0 14px;
+    border-radius: 12px;
+    border-width: 0;
+    border-bottom-width: 4px;
+    border-color: var(--color-superficie-2);
+    background-color: var(--color-superficie);
+    color: var(--color-texto);
+    font-size: var(--fuente-lg);
+    -unity-font-style: bold;
+    -unity-text-align: middle-center;
+    transition-property: opacity, scale;
+    transition-duration: 0.15s, 0.12s;
+}
+
+.ficha:active { scale: 0.94 0.94; }
+.ficha--usada { opacity: 0.25; }
+
+/* ---------- Franja de mensaje ---------- */
+
+.franja {
+    flex-direction: row;
+    align-items: center;
+    padding: 10px 14px;
+    border-radius: 12px;
+    background-color: var(--color-superficie);
+    color: var(--color-texto-sec);
+}
+
+.franja__texto {
+    margin-left: 8px;
+    font-size: var(--fuente-sm);
+    -unity-font-style: bold;
+    flex-shrink: 1;
+}
+
+.franja--error { background-color: var(--color-error-suave); color: var(--color-error); }
+.franja--error .franja__texto { color: var(--color-error); }
+.franja--exito { background-color: var(--color-exito-suave); color: var(--color-exito); }
+.franja--exito .franja__texto { color: var(--color-exito); }
+
+/* ---------- Modal de pista ---------- */
+
+.puntos-antes {
+    font-size: var(--fuente-lg);
+    color: var(--color-texto-sec);
+    -unity-font-style: bold;
+}
+
+.puntos-despues {
+    font-size: var(--fuente-lg);
+    color: var(--color-acento);
+    -unity-font-style: bold;
+}
+
+.pista-item {
+    flex-direction: row;
+    align-items: flex-start;
+    padding: 12px 0;
+    border-bottom-width: 1px;
+    border-color: var(--color-borde);
+}
+
+.pista-item--bloqueada {
+    align-items: center;
+}
+
+.pista-item__titulo {
+    font-size: var(--fuente-sm);
+    -unity-font-style: bold;
+}
+
+.pista-item__texto {
+    margin-top: 2px;
+    font-size: var(--fuente-sm);
+    color: var(--color-texto-sec);
+}

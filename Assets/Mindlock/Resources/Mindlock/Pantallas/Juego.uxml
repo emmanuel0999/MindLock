@@ -1,0 +1,168 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" editor-extension-mode="False">
+    <!-- PANTALLAS 3, 4, 5 y 7: Vista de acertijo (+ modal de pista, respuesta incorrecta y modo diario) -->
+    <ui:VisualElement name="pantallaJuego" class="pantalla">
+
+        <!-- Barra superior -->
+        <ui:VisualElement class="fila entre">
+            <ui:Button name="botonPausa" class="boton-icono">
+                <ui:VisualElement class="ico ico-pausa ico-md" picking-mode="Ignore" />
+            </ui:Button>
+            <ui:VisualElement class="crecer centro">
+                <ui:Label name="lblNivel" text="Nivel 15" class="encabezado centrar-texto" />
+                <ui:Label name="lblSubtitulo" text="800 pts base" class="texto-pequeno centrar-texto" />
+            </ui:VisualElement>
+            <ui:VisualElement class="juego-etiquetas">
+                <ui:Label name="etqDificultad" text="Media" class="etiqueta etiqueta--media" />
+                <ui:Label name="etqCategoria" text="Lógica" class="etiqueta etiqueta--logica mt-xs" />
+            </ui:VisualElement>
+        </ui:VisualElement>
+
+        <!-- Franja del acertijo diario (solo en modo diario) -->
+        <ui:VisualElement name="bannerDiario" class="banner-juego-diario mt-md oculto">
+            <ui:VisualElement class="ico ico-calendario ico-md color-acento" />
+            <ui:VisualElement class="crecer ml-sm">
+                <ui:Label name="lblBannerFecha" text="Miércoles 28 de octubre" class="negrita texto-una-linea" />
+                <ui:VisualElement class="fila mt-xs">
+                    <ui:VisualElement class="ico ico-llama ico-xs color-llama" />
+                    <ui:Label name="lblBannerRacha" text="5 días seguidos" class="texto-pequeno ml-xs" />
+                </ui:VisualElement>
+            </ui:VisualElement>
+            <ui:Label name="lblBannerBonus" text="+150 pts" class="pastilla pastilla--acento" />
+        </ui:VisualElement>
+
+        <!-- Indicadores: tiempo, intentos, puntaje potencial -->
+        <ui:VisualElement class="indicadores mt-md">
+            <ui:VisualElement name="indTiempo" class="indicador">
+                <ui:VisualElement class="ico ico-reloj ico-sm" />
+                <ui:Label name="lblTiempo" text="00:00" class="indicador__valor" />
+            </ui:VisualElement>
+            <ui:VisualElement class="indicador">
+                <ui:VisualElement class="ico ico-diana ico-sm" />
+                <ui:Label name="lblIntentos" text="Intento 1" class="indicador__valor" />
+            </ui:VisualElement>
+            <ui:VisualElement class="indicador indicador--puntos">
+                <ui:VisualElement class="ico ico-estrella ico-sm ico--relleno" />
+                <ui:Label name="lblPuntos" text="800 pts" class="indicador__valor" />
+            </ui:VisualElement>
+        </ui:VisualElement>
+        <ui:VisualElement name="barraTiempoCont" class="barra barra--fina mt-sm oculto">
+            <ui:VisualElement name="barraTiempo" class="barra__relleno" />
+        </ui:VisualElement>
+
+        <ui:ScrollView name="scrollJuego" class="crecer mt-md">
+            <!-- Enunciado -->
+            <ui:VisualElement name="tarjetaEnunciado" class="tarjeta tarjeta-enunciado">
+                <ui:Label name="lblEnunciado" text="Tengo agujas pero no coso, tengo números pero no soy calculadora. ¿Qué soy?" class="enunciado" />
+            </ui:VisualElement>
+
+            <!-- Pistas ya reveladas -->
+            <ui:VisualElement name="pistasVistas" />
+
+            <!-- Respuesta tipo TEXTO -->
+            <ui:VisualElement name="zonaTexto" class="zona-respuesta oculto">
+                <ui:TextField name="campoRespuesta" class="campo-texto" />
+                <ui:Label text="No importan mayúsculas ni acentos" class="texto-pequeno mt-xs" />
+            </ui:VisualElement>
+
+            <!-- Respuesta tipo OPCIÓN MÚLTIPLE (opciones creadas desde código) -->
+            <ui:VisualElement name="zonaOpciones" class="zona-respuesta oculto" />
+
+            <!-- Respuesta tipo SECUENCIA -->
+            <ui:VisualElement name="zonaSecuencia" class="zona-respuesta oculto">
+                <ui:VisualElement name="casillas" class="casillas" />
+                <ui:Label text="Toca una ficha para colocarla. Toca una casilla para quitarla." class="texto-pequeno centrar-texto mt-sm" />
+                <ui:VisualElement name="fichas" class="fichas mt-md" />
+            </ui:VisualElement>
+        </ui:ScrollView>
+
+        <!-- Mensaje de error / acierto -->
+        <ui:VisualElement name="franjaMensaje" class="franja mt-sm oculto">
+            <ui:VisualElement name="franjaIcono" class="ico ico-candado ico-sm" />
+            <ui:Label name="lblFranja" text="Casi... inténtalo de nuevo" class="franja__texto" />
+        </ui:VisualElement>
+        <ui:Button name="botonSugerencia" text="¿Necesitas una pista?" class="boton-texto oculto" />
+
+        <!-- Pie: pista + comprobar -->
+        <ui:VisualElement class="fila mt-sm">
+            <ui:Button name="botonPista" class="boton boton-suave">
+                <ui:VisualElement class="ico ico-bombilla ico-md color-acento" picking-mode="Ignore" />
+                <ui:Label name="lblBotonPista" text="Pista (3)" class="boton__texto" picking-mode="Ignore" />
+            </ui:Button>
+            <ui:Button name="botonComprobar" text="Comprobar" class="boton boton-principal crecer ml-sm" />
+        </ui:VisualElement>
+
+        <!-- MODAL: pausa -->
+        <ui:VisualElement name="modalPausa" class="modal-fondo oculto">
+            <ui:VisualElement class="modal">
+                <ui:VisualElement class="modal__icono modal__icono--neutro">
+                    <ui:VisualElement class="ico ico-pausa ico-lg" />
+                </ui:VisualElement>
+                <ui:Label text="Pausa" class="titulo centrar-texto mt-md" />
+                <ui:Button name="botonContinuar" text="Continuar" class="boton boton-principal mt-lg" />
+                <ui:Button name="botonReiniciar" class="boton boton-suave mt-sm">
+                    <ui:VisualElement class="ico ico-repetir ico-md" picking-mode="Ignore" />
+                    <ui:Label text="Reiniciar nivel" class="boton__texto" picking-mode="Ignore" />
+                </ui:Button>
+                <ui:Button name="botonSalir" text="Volver al mapa" class="boton-texto boton-texto--peligro mt-sm" />
+                <ui:Label text="Perderás el avance de este intento." class="texto-pequeno centrar-texto" />
+            </ui:VisualElement>
+        </ui:VisualElement>
+
+        <!-- MODAL: pistas (3 estados) -->
+        <ui:VisualElement name="modalPista" class="modal-fondo oculto">
+            <ui:VisualElement class="modal">
+
+                <!-- Estado 1: confirmar -->
+                <ui:VisualElement name="estadoConfirmar">
+                    <ui:VisualElement class="modal__icono">
+                        <ui:VisualElement class="ico ico-bombilla ico-lg color-acento" />
+                    </ui:VisualElement>
+                    <ui:Label name="lblConfirmarTitulo" text="¿Usar la pista 1?" class="encabezado centrar-texto mt-md" />
+                    <ui:Label name="lblConfirmarTexto" text="Esta pista resta 100 puntos al nivel." class="texto-sec centrar-texto mt-xs" />
+                    <ui:VisualElement class="fila centro mt-md">
+                        <ui:Label name="lblPuntosAntes" text="800 pts" class="puntos-antes" />
+                        <ui:VisualElement class="ico ico-flecha-der ico-md color-sec ml-sm mr-sm" />
+                        <ui:Label name="lblPuntosDespues" text="700 pts" class="puntos-despues" />
+                    </ui:VisualElement>
+                    <ui:Label name="lblPistasGlobales" text="Te quedan 3 pistas" class="texto-pequeno centrar-texto mt-sm" />
+                    <ui:VisualElement class="fila mt-lg">
+                        <ui:Button name="botonCancelarPista" text="Cancelar" class="boton boton-suave crecer mr-sm" />
+                        <ui:Button name="botonVerPista" text="Ver pista" class="boton boton-principal crecer ml-sm" />
+                    </ui:VisualElement>
+                </ui:VisualElement>
+
+                <!-- Estado 2: lista de pistas -->
+                <ui:VisualElement name="estadoLista" class="oculto">
+                    <ui:Label text="Pistas" class="encabezado" />
+                    <ui:VisualElement name="listaPistas" class="mt-md" />
+                    <ui:Button name="botonVolverAcertijo" text="Volver al acertijo" class="boton boton-principal mt-lg" />
+                </ui:VisualElement>
+
+                <!-- Estado 3: sin pistas -->
+                <ui:VisualElement name="estadoSinPistas" class="oculto">
+                    <ui:VisualElement class="modal__icono modal__icono--neutro">
+                        <ui:VisualElement class="ico ico-bombilla ico-lg color-sec" />
+                    </ui:VisualElement>
+                    <ui:Label name="lblSinPistas" text="No te quedan pistas disponibles" class="encabezado centrar-texto mt-md" />
+                    <ui:Label name="lblSinPistasDetalle" text="Resuelve el acertijo diario para ganar más." class="texto-sec centrar-texto mt-xs" />
+                    <ui:Button name="botonEntendido" text="Entendido" class="boton boton-principal mt-lg" />
+                </ui:VisualElement>
+
+            </ui:VisualElement>
+        </ui:VisualElement>
+
+        <!-- MODAL: tiempo agotado -->
+        <ui:VisualElement name="modalTiempo" class="modal-fondo oculto">
+            <ui:VisualElement class="modal">
+                <ui:VisualElement class="modal__icono modal__icono--error">
+                    <ui:VisualElement class="ico ico-reloj ico-lg color-error" />
+                </ui:VisualElement>
+                <ui:Label text="Se acabó el tiempo" class="encabezado centrar-texto mt-md" />
+                <ui:Label text="No pasa nada: el candado sigue esperándote." class="texto-sec centrar-texto mt-xs" />
+                <ui:Button name="botonReintentar" text="Intentar de nuevo" class="boton boton-principal mt-lg" />
+                <ui:Button name="botonTiempoMapa" text="Volver al mapa" class="boton boton-suave mt-sm" />
+            </ui:VisualElement>
+        </ui:VisualElement>
+
+    </ui:VisualElement>
+</ui:UXML>

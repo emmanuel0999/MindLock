@@ -1,0 +1,60 @@
+/* PANTALLA 9: Opciones */
+
+.grupo-titulo {
+    margin: 16px 0 8px 4px;
+    font-size: var(--fuente-xs);
+    color: var(--color-texto-sec);
+    -unity-font-style: bold;
+    letter-spacing: 1px;
+}
+
+.grupo {
+    border-radius: var(--radio);
+    border-width: 1px;
+    border-color: var(--color-borde);
+    background-color: var(--color-superficie);
+    overflow: hidden;
+}
+
+.grupo--relleno {
+    padding: 16px;
+}
+
+.fila-opcion {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    min-height: 56px;
+    margin: 0;
+    padding: 0 16px;
+    border-width: 0;
+    border-bottom-width: 1px;
+    border-color: var(--color-borde);
+    border-radius: 0;
+    background-color: rgba(0, 0, 0, 0);
+}
+
+.fila-opcion--ultima {
+    border-bottom-width: 0;
+}
+
+.fila-opcion__texto {
+    font-size: var(--fuente-md);
+    flex-shrink: 1;
+}
+
+.fila-boton:active {
+    background-color: var(--color-superficie-2);
+}
+
+.vista-previa {
+    padding: 12px;
+    border-radius: 12px;
+    background-color: var(--color-fondo);
+}
+
+.vista-previa__texto {
+    font-size: var(--fuente-lg);
+    -unity-font-style: bold;
+    -unity-text-align: middle-center;
+}

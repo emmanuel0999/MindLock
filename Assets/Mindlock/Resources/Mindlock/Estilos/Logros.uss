@@ -1,0 +1,133 @@
+/* PANTALLA 8: Logros y puntaje */
+
+.grid-estadisticas {
+    flex-direction: row;
+    flex-wrap: wrap;
+    margin-left: -5px;
+    margin-right: -5px;
+}
+
+.estadistica {
+    width: 50%;
+    padding: 5px;
+}
+
+.estadistica__tarjeta {
+    padding: 14px;
+    border-radius: var(--radio);
+    border-width: 1px;
+    border-color: var(--color-borde);
+    background-color: var(--color-superficie);
+}
+
+.estadistica__valor {
+    margin-top: 8px;
+    font-size: var(--fuente-xl);
+    -unity-font-style: bold;
+    white-space: nowrap;
+}
+
+.estadistica__etiqueta {
+    font-size: var(--fuente-xs);
+    color: var(--color-texto-sec);
+}
+
+.fila-dificultad {
+    flex-direction: row;
+    align-items: center;
+    min-height: 34px;
+}
+
+.fila-dificultad__nombre {
+    width: 72px;
+    font-size: var(--fuente-sm);
+}
+
+.fila-dificultad__cuenta {
+    width: 40px;
+    font-size: var(--fuente-sm);
+    color: var(--color-texto-sec);
+    -unity-text-align: middle-right;
+}
+
+/* Insignias en 3 columnas */
+.grid-logros {
+    flex-direction: row;
+    flex-wrap: wrap;
+    margin-left: -5px;
+    margin-right: -5px;
+}
+
+.insignia-celda {
+    width: 33.33%;
+    padding: 5px;
+}
+
+.insignia {
+    margin: 0;
+    padding: 14px 6px;
+    min-height: 150px;
+    border-radius: var(--radio);
+    border-width: 1px;
+    border-color: var(--color-borde);
+    background-color: var(--color-superficie);
+    align-items: center;
+    justify-content: flex-start;
+    transition-property: scale;
+    transition-duration: 0.12s;
+}
+
+.insignia:active { scale: 0.96 0.96; }
+
+.insignia--obtenida { border-color: var(--color-acento); }
+
+.insignia__circulo {
+    width: 60px;
+    height: 60px;
+    border-radius: 30px;
+    background-color: var(--color-acento-suave);
+    align-items: center;
+    justify-content: center;
+}
+
+.insignia--pendiente .insignia__circulo { background-color: var(--color-superficie-2); }
+
+.insignia__circulo--grande {
+    width: 104px;
+    height: 104px;
+    border-radius: 52px;
+}
+
+.insignia__circulo--pendiente { background-color: var(--color-superficie-2); }
+
+.insignia__candado {
+    position: absolute;
+    right: -2px;
+    bottom: -2px;
+    width: 22px;
+    height: 22px;
+    border-radius: 11px;
+    background-color: var(--color-fondo);
+    border-width: 1px;
+    border-color: var(--color-borde);
+    align-items: center;
+    justify-content: center;
+}
+
+.insignia__nombre {
+    margin-top: 10px;
+    font-size: var(--fuente-sm);
+    -unity-font-style: bold;
+    -unity-text-align: middle-center;
+}
+
+.insignia--pendiente .insignia__nombre { color: var(--color-texto-sec); }
+
+.insignia__detalle {
+    margin-top: 4px;
+    font-size: var(--fuente-xs);
+    color: var(--color-texto-sec);
+    -unity-text-align: middle-center;
+}
+
+.insignia--obtenida .insignia__detalle { color: var(--color-acento); }

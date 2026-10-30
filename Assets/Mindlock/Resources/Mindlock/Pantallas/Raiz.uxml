@@ -1,0 +1,36 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" editor-extension-mode="False">
+    <!-- Contenedor de toda la app: aquí UIManager coloca cada pantalla -->
+    <ui:VisualElement name="app" class="app">
+
+        <ui:VisualElement name="contenedorPantallas" class="contenedor-pantallas" />
+
+        <!-- Barra de navegación inferior (Niveles / Logros / Opciones) -->
+        <ui:VisualElement name="barraNavegacion" class="barra-navegacion">
+            <ui:Button name="tabNiveles" class="tab">
+                <ui:VisualElement class="ico ico-mapa" picking-mode="Ignore" />
+                <ui:Label text="Niveles" class="tab__texto" picking-mode="Ignore" />
+            </ui:Button>
+            <ui:Button name="tabLogros" class="tab">
+                <ui:VisualElement class="ico ico-trofeo" picking-mode="Ignore" />
+                <ui:Label text="Logros" class="tab__texto" picking-mode="Ignore" />
+            </ui:Button>
+            <ui:Button name="tabOpciones" class="tab">
+                <ui:VisualElement class="ico ico-engranaje" picking-mode="Ignore" />
+                <ui:Label text="Opciones" class="tab__texto" picking-mode="Ignore" />
+            </ui:Button>
+        </ui:VisualElement>
+
+        <!-- Aviso emergente: logro obtenido o mensaje corto -->
+        <ui:VisualElement name="toast" class="toast" picking-mode="Ignore">
+            <ui:VisualElement class="toast__icono" picking-mode="Ignore">
+                <ui:VisualElement name="toastIcono" class="ico ico-trofeo color-acento" picking-mode="Ignore" />
+            </ui:VisualElement>
+            <ui:VisualElement class="crecer ml-md" picking-mode="Ignore">
+                <ui:Label name="toastTitulo" text="¡Logro obtenido!" class="texto-pequeno texto-acento negrita" picking-mode="Ignore" />
+                <ui:Label name="toastNombre" text="Mente brillante" class="encabezado" picking-mode="Ignore" />
+                <ui:Label name="toastTexto" text="Completaste 10 niveles sin pistas" class="texto-sec" picking-mode="Ignore" />
+            </ui:VisualElement>
+        </ui:VisualElement>
+
+    </ui:VisualElement>
+</ui:UXML>

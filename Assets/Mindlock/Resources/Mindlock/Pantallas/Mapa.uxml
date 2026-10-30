@@ -1,0 +1,100 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" editor-extension-mode="False">
+    <!-- PANTALLA 2: Mapa de niveles (menú principal) -->
+    <ui:VisualElement name="pantallaMapa" class="pantalla">
+
+        <!-- Encabezado: jugador + puntaje + pistas + racha -->
+        <ui:VisualElement class="fila entre">
+            <ui:VisualElement class="fila crecer">
+                <ui:VisualElement class="avatar avatar--sm">
+                    <ui:Label name="lblInicial" text="A" class="avatar__inicial" />
+                </ui:VisualElement>
+                <ui:VisualElement class="ml-sm crecer">
+                    <ui:Label text="Jugador" class="texto-pequeno" />
+                    <ui:Label name="lblNombreJugador" text="Ana" class="negrita texto-una-linea" />
+                </ui:VisualElement>
+            </ui:VisualElement>
+            <ui:VisualElement class="fila">
+                <ui:VisualElement class="chip">
+                    <ui:VisualElement class="ico ico-trofeo ico-sm color-acento" />
+                    <ui:Label name="lblPuntaje" text="4 250" class="chip__texto" />
+                </ui:VisualElement>
+                <ui:VisualElement class="chip ml-xs">
+                    <ui:VisualElement class="ico ico-bombilla ico-sm color-acento" />
+                    <ui:Label name="lblPistas" text="3" class="chip__texto" />
+                </ui:VisualElement>
+                <ui:VisualElement class="chip ml-xs">
+                    <ui:VisualElement class="ico ico-llama ico-sm color-llama" />
+                    <ui:Label name="lblRacha" text="5" class="chip__texto" />
+                </ui:VisualElement>
+            </ui:VisualElement>
+        </ui:VisualElement>
+
+        <ui:ScrollView name="scrollMapa" class="crecer mt-md">
+
+            <!-- Tarjeta del acertijo diario -->
+            <ui:Button name="tarjetaDiario" class="tarjeta-diario">
+                <ui:VisualElement class="tarjeta-diario__icono" picking-mode="Ignore">
+                    <ui:VisualElement class="ico ico-calendario color-sobre-acento" picking-mode="Ignore" />
+                </ui:VisualElement>
+                <ui:VisualElement class="crecer ml-md" picking-mode="Ignore">
+                    <ui:Label text="Acertijo diario" class="negrita" picking-mode="Ignore" />
+                    <ui:Label name="lblFechaDiario" text="Miércoles 28 de octubre" class="texto-sec" picking-mode="Ignore" />
+                    <ui:Label name="lblBonusDiario" text="+150 pts bonus" class="texto-pequeno texto-acento negrita mt-xs" picking-mode="Ignore" />
+                </ui:VisualElement>
+                <ui:Label name="lblEstadoDiario" text="Jugar" class="pastilla pastilla--acento" picking-mode="Ignore" />
+            </ui:Button>
+
+            <!-- Progreso general -->
+            <ui:VisualElement class="mt-lg">
+                <ui:VisualElement class="fila entre">
+                    <ui:Label text="Tu progreso" class="negrita" />
+                    <ui:Label name="lblProgreso" text="14 de 30 niveles" class="texto-sec" />
+                </ui:VisualElement>
+                <ui:VisualElement class="barra mt-sm">
+                    <ui:VisualElement name="barraProgreso" class="barra__relleno" />
+                </ui:VisualElement>
+            </ui:VisualElement>
+
+            <!-- Los 30 niveles se crean desde PantallaMapa.cs -->
+            <ui:VisualElement name="contenedorNiveles" class="contenedor-niveles" />
+
+        </ui:ScrollView>
+
+        <!-- Hoja inferior: detalle del nivel -->
+        <ui:VisualElement name="hojaNivel" class="modal-fondo modal-fondo--hoja oculto">
+            <ui:VisualElement class="hoja">
+                <ui:VisualElement class="hoja__asa" />
+                <ui:VisualElement class="fila entre">
+                    <ui:Label name="lblHojaTitulo" text="Nivel 15" class="titulo" />
+                    <ui:Button name="botonCerrarHoja" class="boton-icono boton-icono--plano">
+                        <ui:VisualElement class="ico ico-cerrar ico-md color-sec" picking-mode="Ignore" />
+                    </ui:Button>
+                </ui:VisualElement>
+                <ui:VisualElement class="fila mt-xs">
+                    <ui:Label name="etqHojaDificultad" text="Media" class="etiqueta etiqueta--media" />
+                    <ui:Label name="etqHojaCategoria" text="Lógica" class="etiqueta etiqueta--logica ml-sm" />
+                </ui:VisualElement>
+                <ui:VisualElement class="tarjeta tarjeta--plana mt-md">
+                    <ui:VisualElement class="fila-dato">
+                        <ui:Label text="Puntaje base" class="texto-sec" />
+                        <ui:Label name="lblHojaBase" text="800 pts" class="negrita" />
+                    </ui:VisualElement>
+                    <ui:VisualElement class="fila-dato">
+                        <ui:Label text="Tiempo límite" class="texto-sec" />
+                        <ui:Label name="lblHojaTiempo" text="Sin límite" class="negrita" />
+                    </ui:VisualElement>
+                    <ui:VisualElement class="fila-dato">
+                        <ui:Label text="Mejor puntaje" class="texto-sec" />
+                        <ui:Label name="lblHojaMejor" text="-" class="negrita" />
+                    </ui:VisualElement>
+                    <ui:VisualElement class="fila-dato fila-dato--ultima">
+                        <ui:Label text="Estrellas" class="texto-sec" />
+                        <ui:VisualElement name="hojaEstrellas" class="fila" />
+                    </ui:VisualElement>
+                </ui:VisualElement>
+                <ui:Button name="botonEmpezar" text="Empezar" class="boton boton-principal mt-lg" />
+            </ui:VisualElement>
+        </ui:VisualElement>
+
+    </ui:VisualElement>
+</ui:UXML>

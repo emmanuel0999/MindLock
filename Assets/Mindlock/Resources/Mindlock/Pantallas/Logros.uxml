@@ -1,0 +1,52 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" editor-extension-mode="False">
+    <!-- PANTALLA 8: Logros y puntaje -->
+    <ui:VisualElement name="pantallaLogros" class="pantalla">
+
+        <ui:Label text="Logros" class="titulo" />
+        <ui:Label name="lblJugadorLogros" text="Ana" class="texto-sec" />
+
+        <ui:ScrollView name="scrollLogros" class="crecer mt-md">
+
+            <!-- 4 estadísticas (creadas desde código) -->
+            <ui:VisualElement name="gridEstadisticas" class="grid-estadisticas" />
+
+            <!-- Avance por dificultad -->
+            <ui:VisualElement class="tarjeta mt-sm">
+                <ui:Label text="Avance por dificultad" class="negrita" />
+                <ui:VisualElement name="listaDificultades" class="mt-sm" />
+            </ui:VisualElement>
+
+            <!-- Contador de logros -->
+            <ui:VisualElement class="mt-lg">
+                <ui:Label name="lblContadorLogros" text="6 de 9 logros obtenidos" class="negrita" />
+                <ui:VisualElement class="barra mt-sm">
+                    <ui:VisualElement name="barraLogros" class="barra__relleno barra__relleno--acento" />
+                </ui:VisualElement>
+            </ui:VisualElement>
+
+            <!-- Insignias (creadas desde código) -->
+            <ui:VisualElement name="gridLogros" class="grid-logros mt-md" />
+
+        </ui:ScrollView>
+
+        <!-- Hoja inferior: detalle del logro -->
+        <ui:VisualElement name="hojaLogro" class="modal-fondo modal-fondo--hoja oculto">
+            <ui:VisualElement class="hoja">
+                <ui:VisualElement class="hoja__asa" />
+                <ui:VisualElement class="centro">
+                    <ui:VisualElement name="hojaLogroInsignia" class="insignia__circulo insignia__circulo--grande">
+                        <ui:VisualElement name="hojaLogroIcono" class="ico ico-trofeo ico-xl color-acento" />
+                    </ui:VisualElement>
+                    <ui:Label name="lblHojaLogroNombre" text="Mente brillante" class="titulo centrar-texto mt-md" />
+                    <ui:Label name="lblHojaLogroDescripcion" text="Completa 10 niveles sin usar pistas." class="texto-sec centrar-texto mt-xs" />
+                    <ui:Label name="lblHojaLogroEstado" text="Obtenido el 28/10/2026" class="pastilla pastilla--exito mt-md" />
+                </ui:VisualElement>
+                <ui:VisualElement name="barraHojaLogroCont" class="barra mt-md">
+                    <ui:VisualElement name="barraHojaLogro" class="barra__relleno barra__relleno--acento" />
+                </ui:VisualElement>
+                <ui:Button name="botonCerrarLogro" text="Cerrar" class="boton boton-suave mt-lg" />
+            </ui:VisualElement>
+        </ui:VisualElement>
+
+    </ui:VisualElement>
+</ui:UXML>

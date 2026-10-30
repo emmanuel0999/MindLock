@@ -1,0 +1,66 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" editor-extension-mode="False">
+    <!-- PANTALLA 1: Inicio y selección de perfil -->
+    <ui:VisualElement name="pantallaPerfil" class="pantalla">
+
+        <!-- Logo -->
+        <ui:VisualElement class="perfil-logo">
+            <ui:VisualElement class="logotipo">
+                <ui:Label text="MINDL" class="logotipo__letras" />
+                <ui:VisualElement class="logotipo__o">
+                    <ui:VisualElement class="ico ico-anillo logotipo__anillo color-acento" />
+                    <ui:VisualElement class="ico ico-cerradura logotipo__cerradura color-accion" />
+                </ui:VisualElement>
+                <ui:Label text="CK" class="logotipo__letras" />
+            </ui:VisualElement>
+            <ui:Label text="Abre tu mente, nivel a nivel" class="texto-sec centrar-texto mt-sm" />
+        </ui:VisualElement>
+
+        <!-- Lista de perfiles guardados -->
+        <ui:VisualElement name="seccionPerfiles" class="crecer">
+            <ui:Label text="¿Quién juega?" class="encabezado mb-md" />
+            <ui:ScrollView name="scrollPerfiles" class="crecer">
+                <ui:VisualElement name="listaPerfiles" />
+            </ui:ScrollView>
+            <ui:Button name="botonCrearPerfil" class="boton boton-secundario mt-md">
+                <ui:VisualElement class="ico ico-mas ico-md color-accion" picking-mode="Ignore" />
+                <ui:Label text="Crear perfil" class="boton__texto" picking-mode="Ignore" />
+            </ui:Button>
+        </ui:VisualElement>
+
+        <!-- Estado vacío (sin perfiles) -->
+        <ui:VisualElement name="estadoVacio" class="estado-vacio crecer oculto">
+            <ui:VisualElement class="estado-vacio__circulo">
+                <ui:VisualElement class="ico ico-candado-abierto ico-xl color-sec" />
+            </ui:VisualElement>
+            <ui:Label text="Aún no hay jugadores" class="encabezado centrar-texto mt-lg" />
+            <ui:Label text="Crea un perfil para empezar a resolver acertijos." class="texto-sec centrar-texto mt-sm" />
+            <ui:Button name="botonCrearPrimero" text="Crear mi perfil" class="boton boton-acento mt-lg perfil-boton-ancho" />
+        </ui:VisualElement>
+
+        <ui:Label text="Tu progreso se guarda solo en este dispositivo" class="texto-pequeno centrar-texto mt-md" />
+
+        <!-- Modal: crear perfil -->
+        <ui:VisualElement name="modalCrear" class="modal-fondo oculto">
+            <ui:VisualElement class="modal">
+                <ui:VisualElement class="fila entre">
+                    <ui:Label text="Nuevo jugador" class="encabezado" />
+                    <ui:Button name="botonCerrarModal" class="boton-icono boton-icono--plano">
+                        <ui:VisualElement class="ico ico-cerrar ico-md color-sec" picking-mode="Ignore" />
+                    </ui:Button>
+                </ui:VisualElement>
+                <ui:Label text="Elige un nombre o alias para guardar tu progreso." class="texto-sec mt-xs mb-lg" />
+                <ui:Label text="Nombre o alias" class="campo-etiqueta" />
+                <ui:TextField name="campoNombre" max-length="30" class="campo-texto" />
+                <ui:VisualElement class="fila entre mt-xs">
+                    <ui:Label name="mensajeError" text="Escribe un nombre" class="texto-pequeno texto-error" />
+                    <ui:Label name="contadorCaracteres" text="0/30" class="texto-pequeno" />
+                </ui:VisualElement>
+                <ui:VisualElement class="fila mt-lg">
+                    <ui:Button name="botonCancelarModal" text="Cancelar" class="boton boton-suave crecer mr-sm" />
+                    <ui:Button name="botonConfirmarCrear" text="Crear" class="boton boton-principal crecer ml-sm" />
+                </ui:VisualElement>
+            </ui:VisualElement>
+        </ui:VisualElement>
+
+    </ui:VisualElement>
+</ui:UXML>

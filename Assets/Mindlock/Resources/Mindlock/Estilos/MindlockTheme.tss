@@ -1,0 +1,14 @@
+@import url("unity-theme://default");
+
+/* Tema global de Mindlock */
+@import url("MindlockTheme.uss");
+
+/* Estilos de cada pantalla */
+@import url("Raiz.uss");
+@import url("Perfil.uss");
+@import url("Mapa.uss");
+@import url("Juego.uss");
+@import url("Resultado.uss");
+@import url("Diario.uss");
+@import url("Logros.uss");
+@import url("Opciones.uss");

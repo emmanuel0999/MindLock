@@ -1,0 +1,333 @@
+using System.Collections.Generic;
+
+namespace Mindlock.Datos
+{
+    /// <summary>
+    /// Contenido de prueba: 30 acertijos de nivel, 7 diarios y los logros.
+    /// Sirve para probar la interfaz sin base de datos; Ezequiel puede
+    /// reemplazar o ampliar estos acertijos (o cargarlos desde SQLite).
+    /// </summary>
+    public static partial class CatalogoAcertijos
+    {
+        /// <summary>
+        /// true: del nivel 5 al 30 se usan los acertijos de CatalogoAcertijos.Desafio.cs
+        /// y las pistas restan más puntos. false: configuración original.
+        /// Lo asigna UIManager (casilla "Modo Desafio" del Inspector).
+        /// </summary>
+        public static bool ModoDesafio = true;
+
+        // ------------------------------------------------------------------
+        // Reglas por dificultad
+        // ------------------------------------------------------------------
+
+        public static Dificultad DificultadDe(int numero)
+        {
+            if (numero <= 8) return Dificultad.Facil;
+            if (numero <= 16) return Dificultad.Media;
+            if (numero <= 24) return Dificultad.Dificil;
+            return Dificultad.Experto;
+        }
+
+        public static int PuntajeBase(Dificultad d)
+        {
+            switch (d)
+            {
+                case Dificultad.Facil: return 500;
+                case Dificultad.Media: return 800;
+                case Dificultad.Dificil: return 1000;
+                default: return 1500;
+            }
+        }
+
+        public static int TiempoObjetivo(Dificultad d)
+        {
+            switch (d)
+            {
+                case Dificultad.Facil: return 60;
+                case Dificultad.Media: return 90;
+                case Dificultad.Dificil: return 120;
+                default: return 180;
+            }
+        }
+
+        /// <summary>Solo Difícil y Experto tienen tiempo límite.</summary>
+        public static int TiempoLimite(Dificultad d)
+        {
+            switch (d)
+            {
+                case Dificultad.Dificil: return 180;
+                case Dificultad.Experto: return 240;
+                default: return 0;
+            }
+        }
+
+        static int[] Penalizaciones(Dificultad d)
+        {
+            if (ModoDesafio) return PenalizacionesDesafio(d);
+            switch (d)
+            {
+                case Dificultad.Facil: return new[] { 50, 75, 100 };
+                case Dificultad.Media: return new[] { 75, 100, 150 };
+                case Dificultad.Dificil: return new[] { 100, 150, 200 };
+                default: return new[] { 150, 200, 300 };
+            }
+        }
+
+        public static Nivel CrearNivel(int numero, int acertijoId)
+        {
+            var d = DificultadDe(numero);
+            return new Nivel
+            {
+                Numero = numero,
+                Dificultad = d,
+                AcertijoId = acertijoId,
+                PuntajeBase = PuntajeBase(d),
+                TiempoObjetivo = TiempoObjetivo(d),
+                TiempoLimite = TiempoLimite(d)
+            };
+        }
+
+        public static Nivel NivelDiario(int acertijoId)
+        {
+            return new Nivel
+            {
+                Numero = 0,
+                Dificultad = Dificultad.Media,
+                AcertijoId = acertijoId,
+                PuntajeBase = 300,
+                TiempoObjetivo = 90,
+                TiempoLimite = 0
+            };
+        }
+
+        public static void AsignarPenalizaciones(Acertijo a, Dificultad d)
+        {
+            var p = Penalizaciones(d);
+            for (int i = 0; i < a.Pistas.Count; i++) a.Pistas[i].Penalizacion = p[i < p.Length ? i : p.Length - 1];
+        }
+
+        public static void AsignarPenalizacionesDiario(Acertijo a)
+        {
+            int[] p = ModoDesafio ? PenalizacionesDiarioDesafio : new[] { 30, 50, 75 };
+            for (int i = 0; i < a.Pistas.Count; i++) a.Pistas[i].Penalizacion = p[i < p.Length ? i : p.Length - 1];
+        }
+
+        // ------------------------------------------------------------------
+        // Ayudantes para escribir acertijos
+        // ------------------------------------------------------------------
+
+        static Acertijo Texto(int id, Categoria c, string enunciado, string respuestas, params string[] pistas)
+        {
+            return Crear(id, c, TipoRespuesta.Texto, enunciado, respuestas, null, 1, pistas);
+        }
+
+        static Acertijo Opcion(int id, Categoria c, string enunciado, string correcta, string[] opciones, params string[] pistas)
+        {
+            return Crear(id, c, TipoRespuesta.OpcionMultiple, enunciado, correcta, opciones, 1, pistas);
+        }
+
+        static Acertijo Secuencia(int id, Categoria c, string enunciado, string respuesta, string[] fichas, params string[] pistas)
+        {
+            int casillas = respuesta.Split('|').Length;
+            return Crear(id, c, TipoRespuesta.Secuencia, enunciado, respuesta, fichas, casillas, pistas);
+        }
+
+        static Acertijo Crear(int id, Categoria c, TipoRespuesta t, string enunciado, string respuesta, string[] opciones, int casillas, string[] pistas)
+        {
+            var a = new Acertijo { Id = id, Categoria = c, Tipo = t, Enunciado = enunciado, Respuesta = respuesta, Casillas = casillas };
+            if (opciones != null) a.Opciones.AddRange(opciones);
+            for (int i = 0; i < pistas.Length && i < Reglas.MaxPistasPorAcertijo; i++)
+                a.Pistas.Add(new Pista { Orden = i + 1, Texto = pistas[i] });
+            return a;
+        }
+
+        const Categoria L = Categoria.Logica;
+        const Categoria P = Categoria.Palabras;
+        const Categoria T = Categoria.Patrones;
+
+        // ------------------------------------------------------------------
+        // 30 acertijos de nivel (el índice + 1 es el número de nivel)
+        // ------------------------------------------------------------------
+
+        public static List<Acertijo> AcertijosDeNiveles()
+        {
+            var lista = AcertijosOriginales();
+            if (!ModoDesafio) return lista;
+            var desafio = AcertijosDesafio();
+            for (int i = 0; i < desafio.Count; i++) lista[DesafioDesdeNivel - 1 + i] = desafio[i];
+            return lista;
+        }
+
+        /// <summary>Configuración original de los 30 niveles (no se modifica).</summary>
+        public static List<Acertijo> AcertijosOriginales()
+        {
+            return new List<Acertijo>
+            {
+                // ---------- FÁCIL (1-8) ----------
+                Secuencia(1, T, "Completa la serie:\n2, 4, 6, 8, ?", "10", new[] { "9", "10", "12", "14" },
+                    "Fíjate en cuánto aumenta cada número.", "Cada número es 2 más que el anterior.", "8 + 2 = ?"),
+                Texto(2, P, "Tengo agujas pero no coso, tengo números pero no soy calculadora. ¿Qué soy?", "reloj",
+                    "Lo usas para saber algo que cambia todo el día.", "Puede estar en la pared o en tu muñeca.", "Te dice la hora."),
+                Opcion(3, L, "Si todos los gatos son animales y Misi es un gato, entonces...", "Misi es un animal",
+                    new[] { "Misi es un animal", "Todos los animales son gatos", "Misi no es un animal", "No se puede saber" },
+                    "Lee con calma la primera frase.", "Si algo es gato, también es animal.", "Misi está dentro del grupo de los gatos."),
+                Secuencia(4, T, "¿Qué letra sigue?\nA, C, E, G, ?", "I", new[] { "H", "I", "J", "K" },
+                    "Piensa en el abecedario.", "Se salta una letra cada vez.", "Después de G viene H... y se la salta."),
+                Texto(5, P, "Soy un animal grande y peludo, y mi nombre se lee igual al derecho y al revés. ¿Quién soy?", "oso",
+                    "Mi nombre tiene solo 3 letras.", "Me encanta la miel.", "Empiezo y termino con O."),
+                Opcion(6, L, "Pedro es más alto que Luis, y Luis es más alto que Ana. ¿Quién es el más bajo?", "Ana",
+                    new[] { "Pedro", "Luis", "Ana", "No se puede saber" },
+                    "Ordena a los tres de más alto a más bajo.", "Pedro es el más alto de todos.", "Luis está en medio."),
+                Secuencia(7, T, "Completa la serie:\n1, 1, 2, 3, 5, 8, ?", "13", new[] { "11", "12", "13", "16" },
+                    "Mira los dos números anteriores.", "Cada número es la suma de los dos anteriores.", "5 + 8 = ?"),
+                Opcion(8, P, "¿Qué palabra no pertenece al grupo?\nManzana, Pera, Zanahoria, Uva", "Zanahoria",
+                    new[] { "Manzana", "Pera", "Zanahoria", "Uva" },
+                    "Piensa en qué tienen en común casi todas.", "Tres de ellas son frutas.", "Una crece bajo la tierra."),
+
+                // ---------- MEDIA (9-16) ----------
+                Texto(9, L, "Un granjero tiene 17 ovejas. Todas menos 9 se escapan. ¿Cuántas le quedan?", "9;nueve;9 ovejas;nueve ovejas",
+                    "Lee la frase con mucha atención.", "'Todas menos 9' significa que 9 no se escapan.", "No hace falta restar."),
+                Secuencia(10, T, "Completa los dos que faltan:\n3, 6, 12, 24, ?, ?", "48|96", new[] { "30", "36", "48", "72", "96" },
+                    "Compara cada número con el anterior.", "Cada número es el doble del anterior.", "24 x 2 = 48"),
+                Texto(11, P, "Cuanto más le quitas, más grande se vuelve. ¿Qué es?", "hoyo;agujero;hueco;pozo",
+                    "Piensa en cavar.", "Se hace en la tierra con una pala.", "Empieza por H."),
+                Opcion(12, L, "Si ayer fue lunes, ¿qué día será pasado mañana?", "Jueves",
+                    new[] { "Miércoles", "Jueves", "Viernes", "Sábado" },
+                    "Primero averigua qué día es hoy.", "Si ayer fue lunes, hoy es martes.", "Pasado mañana es dos días después de hoy."),
+                Secuencia(13, T, "Ordena de menor a mayor:\n7, 2, 9, 4", "2|4|7|9", new[] { "7", "2", "9", "4" },
+                    "Empieza por el número más pequeño.", "El primero es el 2.", "El último es el 9."),
+                Opcion(14, P, "¿Cuál de estas palabras NO es un anagrama de ROMA?", "MAPA",
+                    new[] { "AMOR", "MORA", "RAMO", "MAPA" },
+                    "Un anagrama usa exactamente las mismas letras.", "ROMA tiene las letras R, O, M y A.", "Busca la palabra con una letra distinta."),
+                Opcion(15, L, "Hay tres cajas: Manzanas, Naranjas y Mixta. Todas las etiquetas están mal. Sacas una fruta de la caja 'Mixta' y es una manzana. ¿Qué contiene esa caja?", "Solo manzanas",
+                    new[] { "Solo manzanas", "Solo naranjas", "Frutas mixtas", "No se puede saber" },
+                    "Todas las etiquetas están equivocadas.", "La caja 'Mixta' no puede tener frutas mixtas.", "Sacaste una manzana y no es mixta..."),
+                Secuencia(16, T, "Completa la serie:\n1, 4, 9, 16, 25, ?", "36", new[] { "30", "35", "36", "49" },
+                    "Piensa en multiplicaciones.", "Son números multiplicados por sí mismos.", "6 x 6 = ?"),
+
+                // ---------- DIFÍCIL (17-24) ----------
+                Texto(17, P, "Si dices mi nombre, desaparezco. ¿Qué soy?", "silencio",
+                    "No se puede ver ni tocar.", "Hay mucho de mí en una biblioteca.", "Es lo contrario del ruido."),
+                Texto(18, L, "Un ladrillo pesa 1 kg más medio ladrillo. ¿Cuántos kilos pesa un ladrillo entero?", "2;dos;2 kg;2kg;2 kilos;dos kilos",
+                    "Medio ladrillo pesa lo mismo que 1 kg.", "Si medio ladrillo pesa 1 kg...", "Dos mitades forman un ladrillo."),
+                Secuencia(19, T, "Completa la serie:\n2, 3, 5, 7, 11, ?", "13", new[] { "12", "13", "14", "15" },
+                    "Estos números tienen algo especial.", "Solo se pueden dividir entre 1 y entre sí mismos.", "Son números primos."),
+                Opcion(20, L, "Una botella con su corcho cuesta $1.10. La botella cuesta $1.00 más que el corcho. ¿Cuánto cuesta el corcho?", "$0.05",
+                    new[] { "$0.05", "$0.10", "$0.15", "$1.00" },
+                    "La respuesta rápida suele ser la incorrecta.", "Si el corcho costara $0.10, la botella costaría $1.10.", "Corcho + (corcho + 1.00) = 1.10"),
+                Opcion(21, P, "¿Qué tienen en común estas palabras?\nRADAR, SOMOS, RECONOCER", "Se leen igual al revés",
+                    new[] { "Se leen igual al revés", "Tienen 5 letras", "Son verbos", "Empiezan por R" },
+                    "Fíjate en el orden de las letras.", "Lee cada palabra de derecha a izquierda.", "Se llaman palíndromos."),
+                Secuencia(22, T, "Completa las dos letras que faltan:\nZ, X, V, T, ?, ?", "R|P", new[] { "S", "R", "Q", "P", "O" },
+                    "Recorre el abecedario hacia atrás.", "Se salta una letra cada vez.", "Después de T (saltando S) viene R."),
+                Texto(23, L, "5 máquinas hacen 5 piezas en 5 minutos. ¿Cuántos minutos tardan 100 máquinas en hacer 100 piezas?", "5;cinco;5 minutos;cinco minutos",
+                    "¿Cuánto tarda una máquina en hacer una pieza?", "Cada máquina hace 1 pieza en 5 minutos.", "Todas trabajan al mismo tiempo."),
+                Texto(24, P, "Tengo ciudades pero no casas, ríos pero no agua y bosques pero no árboles. ¿Qué soy?", "mapa;atlas",
+                    "Me usas para orientarte.", "Puedo ser de papel o estar en tu teléfono.", "Muestro el mundo en pequeño."),
+
+                // ---------- EXPERTO (25-30) ----------
+                Secuencia(25, T, "¿Qué sigue?\n1, 11, 21, 1211, 111221, ?", "312211", new[] { "312211", "1112221", "211211", "312221" },
+                    "No es una operación matemática.", "Cada término describe en voz alta al anterior.", "111221 = tres 1, dos 2, un 1."),
+                Opcion(26, L, "El padre de Ana tiene cinco hijas: Lala, Lele, Lili y Lolo. ¿Cómo se llama la quinta?", "Ana",
+                    new[] { "Lulu", "Ana", "Lala", "No se puede saber" },
+                    "Lee el principio de la pregunta.", "¿De quién es padre?", "Solo se mencionan cuatro nombres..."),
+                Texto(27, P, "Si me tienes, quieres compartirme. Si me compartes, ya no me tienes. ¿Qué soy?", "secreto",
+                    "No es un objeto.", "Si lo cuentas, deja de serlo.", "Se guarda... o se cuenta."),
+                Texto(28, L, "Un caracol está en el fondo de un pozo de 10 metros. Cada día sube 3 metros y cada noche resbala 2. ¿En cuántos días sale?", "8;ocho;8 dias;ocho dias",
+                    "Cada día completo avanza solo 1 metro.", "El último día no resbala porque ya salió.", "Al empezar el día 8 está a 7 metros."),
+                Secuencia(29, T, "Ordena de menor a mayor:\n1/2, 1/3, 2/3, 1/4", "1/4|1/3|1/2|2/3", new[] { "1/2", "1/3", "2/3", "1/4" },
+                    "Imagina una pizza dividida en partes.", "Más partes = trozos más pequeños.", "La menor es 1/4 y la mayor 2/3."),
+                Opcion(30, L, "Hay dos puertas: una lleva a la salida. Un guardia siempre miente y el otro siempre dice la verdad, pero no sabes cuál es cuál. Solo puedes hacer una pregunta. ¿Cuál te asegura la salida?",
+                    "Preguntar qué puerta señalaría el otro guardia y elegir la contraria",
+                    new[]
+                    {
+                        "Preguntar a uno cuál es la salida",
+                        "Preguntar qué puerta señalaría el otro guardia y elegir la contraria",
+                        "Preguntar a ambos y elegir la más votada",
+                        "Preguntar a uno si es mentiroso"
+                    },
+                    "Necesitas una pregunta que funcione con cualquiera de los dos.", "Combina la mentira y la verdad en una sola respuesta.", "Pregunta por lo que diría el otro guardia."),
+            };
+        }
+
+        // ------------------------------------------------------------------
+        // Acertijos diarios (rotan según la fecha)
+        // ------------------------------------------------------------------
+
+        public static List<Acertijo> AcertijosDiarios()
+        {
+            return new List<Acertijo>
+            {
+                Secuencia(101, T, "Completa la serie:\n8, 16, 24, 32, ?", "40", new[] { "36", "40", "42", "48" },
+                    "Cada número aumenta lo mismo.", "Se suma 8 cada vez.", "32 + 8 = ?"),
+                Texto(102, P, "Tengo teclas pero no soy un piano, y tengo espacio pero no habitaciones. ¿Qué soy?", "teclado",
+                    "Lo usas para escribir.", "Suele estar junto a una computadora.", "Empieza por T."),
+                Opcion(103, L, "Si 3 gatos cazan 3 ratones en 3 minutos, ¿cuántos gatos hacen falta para cazar 100 ratones en 100 minutos?", "3",
+                    new[] { "3", "33", "100", "300" },
+                    "¿Cuánto tarda un gato en cazar un ratón?", "Cada gato caza 1 ratón cada 3 minutos.", "En 100 minutos, un gato caza unos 33 ratones."),
+                Texto(104, P, "Sube y baja, pero nunca se mueve de su lugar. ¿Qué es?", "escalera;escaleras",
+                    "Está en muchas casas y edificios.", "Tiene peldaños.", "La usas para cambiar de piso."),
+                Secuencia(105, T, "¿Qué letra sigue?\nE, F, M, A, M, J, ?", "J", new[] { "J", "A", "S", "O" },
+                    "Piensa en el calendario.", "Son las iniciales de algo que se repite cada año.", "Enero, febrero, marzo..."),
+                Opcion(106, L, "¿Qué número sigue?\n10, 9, 7, 4, ?", "0",
+                    new[] { "-1", "0", "1", "2" },
+                    "Mira cuánto se resta cada vez.", "Se resta 1, luego 2, luego 3...", "4 - 4 = ?"),
+                Texto(107, P, "Cuanto más seca, más mojada está. ¿Qué es?", "toalla",
+                    "La usas en el baño.", "Sirve para secarte.", "Después de la ducha..."),
+                Secuencia(108, T, "Completa la serie:\n5, 10, 20, 40, ?", "80", new[] { "60", "70", "80", "90" },
+                    "Compara cada número con el anterior.", "Cada número es el doble del anterior.", "40 x 2 = ?"),
+                Opcion(109, L, "Si mañana es sábado, ¿qué día fue ayer?", "Jueves",
+                    new[] { "Miércoles", "Jueves", "Viernes", "Domingo" },
+                    "Primero averigua qué día es hoy.", "Si mañana es sábado, hoy es viernes.", "Ayer es un día antes de hoy."),
+                Texto(110, P, "Tengo ojos pero no veo, agua pero no la bebo, carne pero no la como y barba pero no soy hombre. ¿Qué soy?", "coco",
+                    "Soy una fruta.", "Crezco en las palmeras.", "Mi agua es muy refrescante."),
+                Secuencia(111, T, "¿Qué letra sigue?\nB, D, F, H, ?", "J", new[] { "I", "J", "K", "L" },
+                    "Piensa en el abecedario.", "Se salta una letra cada vez.", "Después de H viene I... y se la salta."),
+                Opcion(112, L, "María tiene el doble de edad que Juan, que tiene 6 años. ¿Cuántos años tendrá María cuando Juan tenga 10?", "16",
+                    new[] { "14", "16", "20", "24" },
+                    "Calcula primero la edad actual de María.", "María tiene ahora 12 años.", "Los dos cumplen años al mismo ritmo."),
+                Texto(113, P, "Vuela sin alas y llora sin ojos. ¿Qué es?", "nube;nubes",
+                    "Está en el cielo.", "Cuando 'llora' cae agua.", "Puede ser blanca o gris."),
+                Secuencia(114, T, "Ordena de menor a mayor:\n15, 3, 27, 9", "3|9|15|27", new[] { "15", "3", "27", "9" },
+                    "Empieza por el número más pequeño.", "El primero es el 3.", "El último es el 27."),
+                Opcion(115, P, "¿Qué palabra no pertenece al grupo?\nRojo, Azul, Silla, Verde", "Silla",
+                    new[] { "Rojo", "Azul", "Silla", "Verde" },
+                    "Piensa en qué tienen en común casi todas.", "Tres de ellas son colores.", "Una es un mueble."),
+                Texto(116, L, "Si tienes 3 manzanas y te llevas 2, ¿cuántas manzanas tienes tú?", "2;dos;2 manzanas;dos manzanas",
+                    "Lee la pregunta con atención.", "Pregunta cuántas tienes TÚ.", "Las que te llevaste ahora son tuyas."),
+                Secuencia(117, T, "Completa la serie:\n100, 90, 81, 73, ?", "66", new[] { "63", "64", "65", "66" },
+                    "Mira cuánto se resta cada vez.", "Se resta 10, luego 9, luego 8...", "73 - 7 = ?"),
+                Opcion(118, L, "En una carrera adelantas al que va segundo. ¿En qué posición quedas?", "Segundo",
+                    new[] { "Primero", "Segundo", "Tercero", "Último" },
+                    "No te apresures.", "Ocupas el lugar de quien adelantaste.", "Él iba segundo..."),
+                Texto(119, P, "Blanca por dentro, verde por fuera. Si quieres que te lo diga, espera. ¿Qué es?", "pera",
+                    "Es una fruta.", "La respuesta está escondida en el acertijo.", "Lee con calma: es...pera."),
+                Secuencia(120, T, "Completa los dos que faltan:\n1, 3, 6, 10, ?, ?", "15|21", new[] { "13", "14", "15", "20", "21" },
+                    "Mira cuánto aumenta cada vez.", "Se suma 2, luego 3, luego 4...", "10 + 5 = 15"),
+                Opcion(121, L, "Un tren eléctrico va hacia el norte y el viento sopla hacia el sur. ¿Hacia dónde va el humo?", "No echa humo",
+                    new[] { "Hacia el norte", "Hacia el sur", "Hacia arriba", "No echa humo" },
+                    "Fíjate en el tipo de tren.", "Los trenes eléctricos no queman combustible.", "Sin combustión no hay humo."),
+            };
+        }
+
+        // ------------------------------------------------------------------
+        // Logros
+        // ------------------------------------------------------------------
+
+        public static List<Logro> Logros()
+        {
+            return new List<Logro>
+            {
+                new Logro { Id = "primer-candado", Nombre = "Primer candado", Descripcion = "Completa el nivel 1.", Icono = "candado-abierto", Meta = 1 },
+                new Logro { Id = "mente-brillante", Nombre = "Mente brillante", Descripcion = "Completa 10 niveles sin usar pistas.", Icono = "bombilla", Meta = 10 },
+                new Logro { Id = "punteria", Nombre = "Puntería", Descripcion = "Resuelve 5 niveles al primer intento.", Icono = "diana", Meta = 5 },
+                new Logro { Id = "velocista", Nombre = "Velocista", Descripcion = "Resuelve un nivel en menos de 30 segundos.", Icono = "rayo", Meta = 1 },
+                new Logro { Id = "perfeccionista", Nombre = "Perfeccionista", Descripcion = "Consigue 3 estrellas en 10 niveles.", Icono = "estrella", Meta = 10 },
+                new Logro { Id = "constante", Nombre = "Constante", Descripcion = "Mantén una racha diaria de 7 días.", Icono = "llama", Meta = 7 },
+                new Logro { Id = "maestro-patrones", Nombre = "Maestro de patrones", Descripcion = "Completa todos los niveles de Patrones.", Icono = "cuadricula", Meta = 10 },
+                new Logro { Id = "medio-camino", Nombre = "Medio camino", Descripcion = "Completa 15 niveles.", Icono = "bandera", Meta = 15 },
+                new Logro { Id = "experto", Nombre = "Experto", Descripcion = "Completa el nivel 30.", Icono = "trofeo", Meta = 1 },
+            };
+        }
+    }
+}

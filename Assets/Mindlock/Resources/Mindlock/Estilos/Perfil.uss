@@ -1,0 +1,40 @@
+/* PANTALLA 1: Inicio y perfil */
+
+.perfil-logo {
+    align-items: center;
+    margin-top: 56px;
+    margin-bottom: 44px;
+}
+
+.perfil-boton-ancho {
+    align-self: stretch;
+}
+
+/* Tarjeta de cada perfil (se crea desde PantallaPerfil.cs) */
+.tarjeta-perfil {
+    flex-direction: row;
+    align-items: center;
+    margin: 0 0 10px 0;
+    padding: 14px 14px;
+    min-height: 76px;
+    border-radius: var(--radio);
+    border-width: 1px;
+    border-color: var(--color-borde);
+    background-color: var(--color-superficie);
+    color: var(--color-texto-sec);
+    transition-property: scale, border-color;
+    transition-duration: 0.12s, 0.12s;
+}
+
+.tarjeta-perfil:active {
+    scale: 0.98 0.98;
+    border-color: var(--color-accion);
+}
+
+.tarjeta-perfil__nombre {
+    font-size: var(--fuente-lg);
+    -unity-font-style: bold;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}

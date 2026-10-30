@@ -1,0 +1,69 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" editor-extension-mode="False">
+    <!-- PANTALLA 7: Acertijo diario (pendiente / ya resuelto / racha perdida) -->
+    <ui:VisualElement name="pantallaDiario" class="pantalla">
+
+        <ui:VisualElement class="fila">
+            <ui:Button name="botonVolverDiario" class="boton-icono">
+                <ui:VisualElement class="ico ico-flecha-izq ico-md" picking-mode="Ignore" />
+            </ui:Button>
+            <ui:Label text="Acertijo del día" class="encabezado ml-md" />
+        </ui:VisualElement>
+
+        <!-- Encabezado ámbar -->
+        <ui:VisualElement class="banner-diario mt-md">
+            <ui:VisualElement class="banner-diario__icono">
+                <ui:VisualElement class="ico ico-calendario ico-lg color-sobre-acento" />
+            </ui:VisualElement>
+            <ui:VisualElement class="crecer ml-md">
+                <ui:Label name="lblFechaDiario" text="Miércoles 28 de octubre" class="negrita" />
+                <ui:Label name="lblCategoriaDiario" text="Categoría: Patrones" class="texto-sec mt-xs" />
+            </ui:VisualElement>
+            <ui:Label name="lblBonusDiario" text="+150 pts" class="pastilla pastilla--acento" />
+        </ui:VisualElement>
+
+        <ui:ScrollView name="scrollDiario" class="crecer mt-md">
+
+            <!-- Estado: pendiente -->
+            <ui:VisualElement name="estadoPendiente">
+                <ui:VisualElement name="avisoRachaPerdida" class="aviso aviso--suave mb-md oculto">
+                    <ui:VisualElement class="ico ico-llama ico-md color-sec" />
+                    <ui:Label text="Tu racha se reinició. ¡Empieza una nueva hoy!" class="aviso__texto" />
+                </ui:VisualElement>
+                <ui:VisualElement class="tarjeta centro">
+                    <ui:VisualElement class="ico ico-llama ico-xl color-llama" />
+                    <ui:Label name="lblRachaPendiente" text="5 días seguidos" class="encabezado centrar-texto mt-sm" />
+                    <ui:Label text="Resuelve el acertijo de hoy para mantener tu racha y ganar una pista extra." class="texto-sec centrar-texto mt-xs" />
+                    <ui:Button name="botonJugarDiario" text="Jugar ahora" class="boton boton-acento mt-lg boton-diario" />
+                </ui:VisualElement>
+            </ui:VisualElement>
+
+            <!-- Estado: ya resuelto hoy -->
+            <ui:VisualElement name="estadoResuelto" class="oculto">
+                <ui:VisualElement class="centro">
+                    <ui:VisualElement class="diario-check">
+                        <ui:VisualElement class="ico ico-check ico-xl color-exito" />
+                    </ui:VisualElement>
+                    <ui:Label name="lblResueltoTitulo" text="¡Resuelto! +150 pts" class="titulo centrar-texto mt-md" />
+                    <ui:VisualElement class="fila centro mt-sm">
+                        <ui:VisualElement name="llamaResuelto" class="ico ico-llama ico-lg color-llama llama-racha" />
+                        <ui:Label name="lblRachaResuelto" text="6 días seguidos" class="encabezado texto-acento ml-sm" />
+                    </ui:VisualElement>
+                </ui:VisualElement>
+                <ui:VisualElement class="tarjeta centro mt-lg">
+                    <ui:Label text="Próximo acertijo en" class="texto-sec" />
+                    <ui:Label name="lblCuentaRegresiva" text="16:22:05" class="cuenta-regresiva mt-xs" />
+                </ui:VisualElement>
+            </ui:VisualElement>
+
+            <!-- Semana -->
+            <ui:VisualElement class="tarjeta mt-md">
+                <ui:Label text="Esta semana" class="negrita" />
+                <ui:VisualElement name="filaSemana" class="fila-semana mt-md" />
+            </ui:VisualElement>
+
+        </ui:ScrollView>
+
+        <ui:Button name="botonDiarioMapa" text="Volver al mapa" class="boton boton-suave mt-md" />
+
+    </ui:VisualElement>
+</ui:UXML>

@@ -1,0 +1,135 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" editor-extension-mode="False">
+    <!-- PANTALLA 9: Opciones -->
+    <ui:VisualElement name="pantallaOpciones" class="pantalla">
+
+        <ui:Label text="Opciones" class="titulo" />
+
+        <ui:ScrollView name="scrollOpciones" class="crecer mt-md">
+
+            <!-- Sonido -->
+            <ui:Label text="SONIDO" class="grupo-titulo" />
+            <ui:VisualElement class="grupo">
+                <ui:VisualElement name="filaMusica" class="fila-opcion">
+                    <ui:Label text="Música" class="fila-opcion__texto" />
+                    <ui:VisualElement class="interruptor"><ui:VisualElement class="interruptor__perilla" /></ui:VisualElement>
+                </ui:VisualElement>
+                <ui:VisualElement name="filaEfectos" class="fila-opcion">
+                    <ui:Label text="Efectos de sonido" class="fila-opcion__texto" />
+                    <ui:VisualElement class="interruptor"><ui:VisualElement class="interruptor__perilla" /></ui:VisualElement>
+                </ui:VisualElement>
+                <ui:VisualElement name="filaVibracion" class="fila-opcion fila-opcion--ultima">
+                    <ui:Label text="Vibración" class="fila-opcion__texto" />
+                    <ui:VisualElement class="interruptor"><ui:VisualElement class="interruptor__perilla" /></ui:VisualElement>
+                </ui:VisualElement>
+            </ui:VisualElement>
+
+            <!-- Pantalla -->
+            <ui:Label text="PANTALLA" class="grupo-titulo" />
+            <ui:VisualElement class="grupo grupo--relleno">
+                <ui:Label text="Tema" class="fila-opcion__texto mb-sm" />
+                <ui:VisualElement class="segmentos">
+                    <ui:Button name="segTemaOscuro" text="Oscuro" class="segmento" />
+                    <ui:Button name="segTemaClaro" text="Claro" class="segmento" />
+                    <ui:Button name="segTemaAuto" text="Automático" class="segmento" />
+                </ui:VisualElement>
+                <ui:Label text="Colores" class="fila-opcion__texto mt-md mb-sm" />
+                <ui:VisualElement class="segmentos">
+                    <ui:Button name="segPaletaClasica" text="Clásica" class="segmento" />
+                    <ui:Button name="segPaletaOceano" text="Océano" class="segmento" />
+                    <ui:Button name="segPaletaAurora" text="Aurora" class="segmento" />
+                </ui:VisualElement>
+                <ui:Label text="Tamaño de texto" class="fila-opcion__texto mt-md mb-sm" />
+                <ui:VisualElement class="segmentos">
+                    <ui:Button name="segTextoPequeno" text="Pequeño" class="segmento" />
+                    <ui:Button name="segTextoNormal" text="Normal" class="segmento" />
+                    <ui:Button name="segTextoGrande" text="Grande" class="segmento" />
+                </ui:VisualElement>
+                <ui:VisualElement class="vista-previa mt-sm">
+                    <ui:Label text="Así se verá el texto de los acertijos." class="vista-previa__texto" />
+                </ui:VisualElement>
+            </ui:VisualElement>
+
+            <!-- Juego -->
+            <ui:Label text="JUEGO" class="grupo-titulo" />
+            <ui:VisualElement class="grupo">
+                <ui:VisualElement name="filaTemporizador" class="fila-opcion">
+                    <ui:Label text="Mostrar temporizador" class="fila-opcion__texto" />
+                    <ui:VisualElement class="interruptor"><ui:VisualElement class="interruptor__perilla" /></ui:VisualElement>
+                </ui:VisualElement>
+                <ui:VisualElement name="filaConfirmarPistas" class="fila-opcion fila-opcion--ultima">
+                    <ui:Label text="Confirmar antes de usar pistas" class="fila-opcion__texto" />
+                    <ui:VisualElement class="interruptor"><ui:VisualElement class="interruptor__perilla" /></ui:VisualElement>
+                </ui:VisualElement>
+            </ui:VisualElement>
+
+            <!-- Perfil -->
+            <ui:Label text="PERFIL" class="grupo-titulo" />
+            <ui:VisualElement class="grupo">
+                <ui:VisualElement class="fila-opcion">
+                    <ui:Label text="Jugador actual" class="fila-opcion__texto" />
+                    <ui:Label name="lblJugadorActual" text="Ana" class="negrita texto-accion" />
+                </ui:VisualElement>
+                <ui:Button name="botonCambiarPerfil" class="fila-opcion fila-boton">
+                    <ui:Label text="Cambiar de perfil" class="fila-opcion__texto" picking-mode="Ignore" />
+                    <ui:VisualElement class="ico ico-flecha-der ico-md color-sec" picking-mode="Ignore" />
+                </ui:Button>
+                <ui:Button name="botonReiniciarProgreso" class="fila-opcion fila-opcion--ultima fila-boton">
+                    <ui:Label text="Reiniciar progreso" class="fila-opcion__texto texto-error negrita" picking-mode="Ignore" />
+                    <ui:VisualElement class="ico ico-repetir ico-md color-error" picking-mode="Ignore" />
+                </ui:Button>
+            </ui:VisualElement>
+
+            <!-- Acerca de -->
+            <ui:Label text="ACERCA DE" class="grupo-titulo" />
+            <ui:VisualElement class="grupo grupo--relleno">
+                <ui:VisualElement class="fila entre">
+                    <ui:VisualElement class="logotipo logotipo--pequeno">
+                        <ui:Label text="MINDL" class="logotipo__letras" />
+                        <ui:VisualElement class="logotipo__o">
+                            <ui:VisualElement class="ico ico-anillo logotipo__anillo color-acento" />
+                            <ui:VisualElement class="ico ico-cerradura logotipo__cerradura color-accion" />
+                        </ui:VisualElement>
+                        <ui:Label text="CK" class="logotipo__letras" />
+                    </ui:VisualElement>
+                    <ui:Label name="lblVersion" text="Versión 1.0" class="texto-sec" />
+                </ui:VisualElement>
+                <ui:Label text="Emmanuel Rodriguez - dirección y desarrollo" class="texto-sec mt-md" />
+                <ui:Label text="Ezequiel Javier Herrera - diseño de acertijos e interfaz" class="texto-sec mt-xs" />
+                <ui:Label text="Dionicio Moreta Andujar - pruebas y calidad" class="texto-sec mt-xs" />
+            </ui:VisualElement>
+
+            <ui:Label text="Tu progreso se guarda solo en este dispositivo. No necesitas internet." class="texto-pequeno centrar-texto mt-md mb-lg" />
+
+        </ui:ScrollView>
+
+        <!-- MODAL: reiniciar progreso (2 pasos) -->
+        <ui:VisualElement name="modalReiniciar" class="modal-fondo oculto">
+            <ui:VisualElement class="modal">
+
+                <ui:VisualElement name="pasoAdvertencia">
+                    <ui:VisualElement class="modal__icono modal__icono--error">
+                        <ui:VisualElement class="ico ico-alerta ico-lg color-error" />
+                    </ui:VisualElement>
+                    <ui:Label text="¿Reiniciar progreso?" class="encabezado centrar-texto mt-md" />
+                    <ui:Label text="Se borrarán tus niveles, puntajes, pistas y logros. Esta acción no se puede deshacer." class="texto-sec centrar-texto mt-xs" />
+                    <ui:VisualElement class="fila mt-lg">
+                        <ui:Button name="botonCancelarReinicio1" text="Cancelar" class="boton boton-suave crecer mr-sm" />
+                        <ui:Button name="botonContinuarReinicio" text="Continuar" class="boton boton-peligro crecer ml-sm" />
+                    </ui:VisualElement>
+                </ui:VisualElement>
+
+                <ui:VisualElement name="pasoConfirmar" class="oculto">
+                    <ui:Label text="Confirma el reinicio" class="encabezado" />
+                    <ui:Label name="lblConfirmarNombre" text="Escribe «Ana» para confirmar." class="texto-sec mt-xs mb-md" />
+                    <ui:TextField name="campoConfirmar" class="campo-texto" />
+                    <ui:VisualElement class="fila mt-lg">
+                        <ui:Button name="botonCancelarReinicio2" text="Cancelar" class="boton boton-suave crecer mr-sm" />
+                        <ui:Button name="botonConfirmarReinicio" text="Reiniciar" class="boton boton-peligro crecer ml-sm" />
+                    </ui:VisualElement>
+                </ui:VisualElement>
+
+            </ui:VisualElement>
+        </ui:VisualElement>
+
+    </ui:VisualElement>
+</ui:UXML>
