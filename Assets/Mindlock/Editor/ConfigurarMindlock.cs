@@ -32,14 +32,14 @@ namespace Mindlock.Herramientas
         [MenuItem("Mindlock/Abrir carpeta de datos guardados", priority = 20)]
         static void AbrirDatos()
         {
-            EditorUtility.RevealInFinder(Application.persistentDataPath);
+            EditorUtility.RevealInFinder(Datos.ArchivoJuegoService.Carpeta());
         }
 
         [MenuItem("Mindlock/Borrar datos guardados", priority = 21)]
         static void BorrarDatos()
         {
             if (!EditorUtility.DisplayDialog("Mindlock", "¿Borrar perfiles y progreso guardados en este equipo?", "Borrar", "Cancelar")) return;
-            string ruta = Path.Combine(Application.persistentDataPath, Datos.ArchivoJuegoService.NombreArchivo);
+            string ruta = Path.Combine(Datos.ArchivoJuegoService.Carpeta(), Datos.ArchivoJuegoService.NombreArchivo);
             foreach (var f in new[] { ruta, ruta + ".bak", ruta + ".tmp" })
                 if (File.Exists(f)) File.Delete(f);
             Debug.Log("[Mindlock] Datos borrados.");
@@ -56,9 +56,10 @@ namespace Mindlock.Herramientas
             ps.themeStyleSheet = AssetDatabase.LoadAssetAtPath<ThemeStyleSheet>(RutaTema);
             if (ps.themeStyleSheet == null) Debug.LogError("[Mindlock] No se encontró " + RutaTema);
             ps.scaleMode = PanelScaleMode.ScaleWithScreenSize;
-            ps.referenceResolution = new Vector2Int(390, 844);
-            ps.screenMatchMode = PanelScreenMatchMode.MatchWidthOrHeight;
-            ps.match = 0.5f;
+            // Expand: el panel nunca mide menos de 390 x 760, así cabe en cualquier pantalla
+            // (en las anchas, UIManager centra la app como una columna)
+            ps.referenceResolution = new Vector2Int(390, 760);
+            ps.screenMatchMode = PanelScreenMatchMode.Expand;
             EditorUtility.SetDirty(ps);
             return ps;
         }
@@ -87,19 +88,26 @@ namespace Mindlock.Herramientas
 
         static void AjustarJugador()
         {
-            PlayerSettings.companyName = "Unicaribe";
+            // En PC el progreso va en .../LocalLow/Mindlock (ArchivoJuegoService.Carpeta);
+            // Unity deja sus registros en .../LocalLow/Mindlock/Mindlock
+            PlayerSettings.companyName = "Mindlock";
             PlayerSettings.productName = "Mindlock";
             PlayerSettings.bundleVersion = "1.0";
 
-            // Juego de teléfono en vertical
-            PlayerSettings.defaultInterfaceOrientation = UIOrientation.Portrait;
-            PlayerSettings.allowedAutorotateToLandscapeLeft = false;
-            PlayerSettings.allowedAutorotateToLandscapeRight = false;
+            // Gira con el teléfono: vertical u horizontal
+            PlayerSettings.defaultInterfaceOrientation = UIOrientation.AutoRotation;
+            PlayerSettings.allowedAutorotateToPortrait = true;
+            PlayerSettings.allowedAutorotateToPortraitUpsideDown = true;
+            PlayerSettings.allowedAutorotateToLandscapeLeft = true;
+            PlayerSettings.allowedAutorotateToLandscapeRight = true;
 
             foreach (var destino in new[] { NamedBuildTarget.Android, NamedBuildTarget.iOS, NamedBuildTarget.Standalone })
-                PlayerSettings.SetApplicationIdentifier(destino, "com.unicaribe.mindlock");
+                PlayerSettings.SetApplicationIdentifier(destino, "com.frailescitystudios.mindlock");
 
-            // En PC se abre como una ventana con forma de teléfono
+            // El adaptador de AdMob de LevelPlay exige Android 7.0 (API 24) como mínimo
+            PlayerSettings.Android.minSdkVersion = AndroidSdkVersions.AndroidApiLevel24;
+
+            // En PC se abre como una ventana con forma de teléfono que se puede agrandar
             PlayerSettings.fullScreenMode = FullScreenMode.Windowed;
             PlayerSettings.defaultScreenWidth = 450;
             PlayerSettings.defaultScreenHeight = 900;

@@ -29,6 +29,8 @@ namespace Mindlock.Datos
         int EstrellasTotales(int jugadorId);
         /// <summary>Descuenta una pista del contador del jugador. Devuelve false si no le quedan.</summary>
         bool UsarPista(int jugadorId);
+        /// <summary>Suma una pista (anuncio con recompensa). Devuelve false si ya tiene el máximo.</summary>
+        bool GanarPista(int jugadorId);
         /// <summary>Guarda el resultado, desbloquea el siguiente nivel y revisa logros.</summary>
         ResultadoNivel RegistrarNivel(int jugadorId, ResultadoIntento intento);
     }
@@ -56,6 +58,25 @@ namespace Mindlock.Datos
     }
 
     /// <summary>Historial de respuestas (tabla intento).</summary>
+    /// <summary>Vidas, monedas y anuncios con recompensa del jugador.</summary>
+    public interface IEconomiaService
+    {
+        /// <summary>Vidas actuales; antes suma las que se recargaron con el tiempo.</summary>
+        int Vidas(int jugadorId);
+        /// <summary>Cuánto falta para la próxima vida (TimeSpan.Zero si están llenas).</summary>
+        TimeSpan TiempoParaVida(int jugadorId);
+        /// <summary>Resta una vida por una respuesta incorrecta o tiempo agotado. Devuelve las que quedan.</summary>
+        int PerderVida(int jugadorId);
+        bool LlenarVidasConMonedas(int jugadorId);
+        bool ComprarPista(int jugadorId);
+        int AnunciosRestantesHoy(int jugadorId);
+        /// <summary>
+        /// Entrega la recompensa de un anuncio visto completo. Vida: cada AnunciosPorVida anuncios suma 1.
+        /// DuplicarMonedas suma otra vez "cantidad". Devuelve false si no se pudo (límite diario, máximo...).
+        /// </summary>
+        bool Recompensar(int jugadorId, Recompensa tipo, int cantidad = 0);
+    }
+
     public interface IIntentoService
     {
         /// <summary>Guarda una respuesta incorrecta. Las correctas las guardan RegistrarNivel y RegistrarDiario.</summary>

@@ -6,6 +6,15 @@
 
         <ui:ScrollView name="scrollOpciones" class="crecer mt-md">
 
+            <!-- Idioma (los nombres de cada idioma no se traducen) -->
+            <ui:Label text="IDIOMA" class="grupo-titulo" />
+            <ui:VisualElement class="grupo grupo--relleno">
+                <ui:VisualElement class="segmentos">
+                    <ui:Button name="segIdiomaIngles" text="English" class="segmento" />
+                    <ui:Button name="segIdiomaEspanol" text="Español" class="segmento" />
+                </ui:VisualElement>
+            </ui:VisualElement>
+
             <!-- Sonido -->
             <ui:Label text="SONIDO" class="grupo-titulo" />
             <ui:VisualElement class="grupo">
@@ -79,6 +88,23 @@
                 </ui:Button>
             </ui:VisualElement>
 
+            <!-- Privacidad: las páginas abren en el navegador; las preferencias de anuncios solo salen donde la ley lo pide -->
+            <ui:Label text="PRIVACIDAD" class="grupo-titulo" />
+            <ui:VisualElement class="grupo">
+                <ui:Button name="botonPolitica" class="fila-opcion fila-boton">
+                    <ui:Label text="Política de privacidad" class="fila-opcion__texto" picking-mode="Ignore" />
+                    <ui:VisualElement class="ico ico-flecha-der ico-md color-sec" picking-mode="Ignore" />
+                </ui:Button>
+                <ui:Button name="botonTerminos" class="fila-opcion fila-boton">
+                    <ui:Label text="Términos y condiciones" class="fila-opcion__texto" picking-mode="Ignore" />
+                    <ui:VisualElement class="ico ico-flecha-der ico-md color-sec" picking-mode="Ignore" />
+                </ui:Button>
+                <ui:Button name="botonPreferenciasAnuncios" class="fila-opcion fila-opcion--ultima fila-boton">
+                    <ui:Label text="Preferencias de anuncios" class="fila-opcion__texto" picking-mode="Ignore" />
+                    <ui:VisualElement class="ico ico-flecha-der ico-md color-sec" picking-mode="Ignore" />
+                </ui:Button>
+            </ui:VisualElement>
+
             <!-- Acerca de -->
             <ui:Label text="ACERCA DE" class="grupo-titulo" />
             <ui:VisualElement class="grupo grupo--relleno">
@@ -93,9 +119,13 @@
                     </ui:VisualElement>
                     <ui:Label name="lblVersion" text="Versión 1.0" class="texto-sec" />
                 </ui:VisualElement>
-                <ui:Label text="Emmanuel Rodriguez - dirección y desarrollo" class="texto-sec mt-md" />
-                <ui:Label text="Ezequiel Javier Herrera - diseño de acertijos e interfaz" class="texto-sec mt-xs" />
-                <ui:Label text="Dionicio Moreta Andujar - pruebas y calidad" class="texto-sec mt-xs" />
+                <ui:Label text="Frailes City Studios" class="negrita mt-md" />
+                <ui:Label text="Contacto" class="texto-pequeno mt-sm" />
+                <ui:Button name="botonContacto" class="boton-contacto">
+                    <ui:Label name="lblContacto" text="frailescitystudios@gmail.com" class="texto-accion negrita" picking-mode="Ignore" />
+                    <ui:VisualElement class="ico ico-flecha-der ico-sm color-accion ml-xs" picking-mode="Ignore" />
+                </ui:Button>
+                <ui:Label name="lblDerechos" text="© 2026 Frailes City Studios" class="texto-pequeno mt-sm" />
             </ui:VisualElement>
 
             <ui:Label text="Tu progreso se guarda solo en este dispositivo. No necesitas internet." class="texto-pequeno centrar-texto mt-md mb-lg" />

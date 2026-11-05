@@ -1,4 +1,7 @@
 <ui:UXML xmlns:ui="UnityEngine.UIElements" editor-extension-mode="False">
+    <!-- Ocupa toda la pantalla: aplica el tema y el área segura, y centra la app en pantallas anchas -->
+    <ui:VisualElement name="marco" class="marco">
+
     <!-- Contenedor de toda la app: aquí UIManager coloca cada pantalla -->
     <ui:VisualElement name="app" class="app">
 
@@ -20,6 +23,114 @@
             </ui:Button>
         </ui:VisualElement>
 
+        <!-- Banner de anuncio, abajo de todo (se oculta mientras se resuelve un acertijo).
+             Con LevelPlay queda vacío y solo reserva el lugar del banner nativo -->
+        <ui:Button name="banner" class="banner oculto">
+            <ui:VisualElement class="banner__icono" picking-mode="Ignore">
+                <ui:VisualElement name="bannerIcono" class="ico ico-calendario ico-md color-acento" picking-mode="Ignore" />
+            </ui:VisualElement>
+            <ui:VisualElement class="crecer ml-sm" picking-mode="Ignore">
+                <ui:VisualElement class="fila" picking-mode="Ignore">
+                    <ui:Label text="Anuncio" class="banner__etiqueta" picking-mode="Ignore" />
+                    <ui:Label name="bannerTitulo" text="Acertijo diario" class="banner__titulo ml-xs texto-una-linea" picking-mode="Ignore" />
+                </ui:VisualElement>
+                <ui:Label name="bannerTexto" text="Un reto nuevo cada día y 150 puntos extra" class="banner__texto texto-una-linea" picking-mode="Ignore" />
+            </ui:VisualElement>
+            <ui:VisualElement class="ico ico-flecha-der ico-sm color-sec ml-sm" picking-mode="Ignore" />
+        </ui:Button>
+
+        <!-- Vidas: sin vidas, o al tocar el contador del mapa -->
+        <ui:VisualElement name="modalVidas" class="modal-fondo oculto">
+            <ui:VisualElement class="modal">
+                <ui:VisualElement class="fila">
+                    <ui:Label name="lblVidasTitulo" text="Te quedaste sin vidas" class="encabezado crecer" />
+                    <ui:Button name="botonCerrarVidas" class="boton-icono boton-icono--plano">
+                        <ui:VisualElement class="ico ico-cerrar ico-sm" picking-mode="Ignore" />
+                    </ui:Button>
+                </ui:VisualElement>
+                <ui:VisualElement name="filaCorazones" class="fila centro mt-md">
+                    <ui:VisualElement class="ico ico-corazon ico-lg color-error corazon" />
+                    <ui:VisualElement class="ico ico-corazon ico-lg color-error corazon" />
+                    <ui:VisualElement class="ico ico-corazon ico-lg color-error corazon" />
+                    <ui:VisualElement class="ico ico-corazon ico-lg color-error corazon" />
+                </ui:VisualElement>
+                <ui:Label name="lblModalVidasTiempo" text="Próxima vida en 49:59" class="texto-sec centrar-texto mt-sm" />
+                <ui:Button name="botonVidaAnuncio" class="boton boton-acento boton--largo anuncio__accion">
+                    <ui:VisualElement class="ico ico-corazon ico-sm color-sobre-acento mr-xs" picking-mode="Ignore" />
+                    <ui:Label name="lblVidaAnuncio" text="Ver 2 anuncios: +1 vida" class="boton__texto" picking-mode="Ignore" />
+                </ui:Button>
+                <ui:Button name="botonVidaMonedas" class="boton boton-secundario boton--largo anuncio__siguiente">
+                    <ui:VisualElement class="ico ico-moneda ico-sm mr-xs" picking-mode="Ignore" />
+                    <ui:Label name="lblVidaMonedas" text="Llenar vidas: 100 monedas" class="boton__texto" picking-mode="Ignore" />
+                </ui:Button>
+                <ui:Label name="lblVidasSaldo" text="Tienes 0 monedas" class="texto-pequeno centrar-texto mt-sm" />
+                <ui:Button name="botonEsperarVidas" text="Esperar" class="boton boton-suave anuncio__siguiente" />
+            </ui:VisualElement>
+        </ui:VisualElement>
+
+        <!-- Tienda: se abre al tocar las monedas del mapa -->
+        <ui:VisualElement name="modalTienda" class="modal-fondo oculto">
+            <ui:VisualElement class="modal">
+                <ui:VisualElement class="fila">
+                    <ui:Label text="Tienda" class="encabezado crecer" />
+                    <ui:Button name="botonCerrarTienda" class="boton-icono boton-icono--plano">
+                        <ui:VisualElement class="ico ico-cerrar ico-sm" picking-mode="Ignore" />
+                    </ui:Button>
+                </ui:VisualElement>
+                <ui:VisualElement class="fila centro mt-md">
+                    <ui:VisualElement class="ico ico-moneda ico-lg color-acento" />
+                    <ui:Label name="lblTiendaMonedas" text="0" class="titulo ml-sm" />
+                </ui:VisualElement>
+                <ui:Label text="monedas" class="texto-sec centrar-texto" />
+                <ui:Button name="botonTiendaVidas" class="tienda__item mt-md">
+                    <ui:VisualElement class="ico ico-corazon ico-md color-error" picking-mode="Ignore" />
+                    <ui:VisualElement class="crecer ml-sm" picking-mode="Ignore">
+                        <ui:Label text="Llenar vidas" class="negrita" picking-mode="Ignore" />
+                        <ui:Label name="lblTiendaVidasEstado" text="Tienes 4 de 4" class="texto-pequeno" picking-mode="Ignore" />
+                    </ui:VisualElement>
+                    <ui:Label name="lblPrecioVidas" text="100" class="tienda__precio" picking-mode="Ignore" />
+                    <ui:VisualElement class="ico ico-moneda ico-sm color-acento ml-xs" picking-mode="Ignore" />
+                </ui:Button>
+                <ui:Button name="botonTiendaPista" class="tienda__item mt-sm">
+                    <ui:VisualElement class="ico ico-bombilla ico-md color-acento" picking-mode="Ignore" />
+                    <ui:VisualElement class="crecer ml-sm" picking-mode="Ignore">
+                        <ui:Label text="1 pista" class="negrita" picking-mode="Ignore" />
+                        <ui:Label name="lblTiendaPistasEstado" text="Tienes 3" class="texto-pequeno" picking-mode="Ignore" />
+                    </ui:VisualElement>
+                    <ui:Label name="lblPrecioPista" text="50" class="tienda__precio" picking-mode="Ignore" />
+                    <ui:VisualElement class="ico ico-moneda ico-sm color-acento ml-xs" picking-mode="Ignore" />
+                </ui:Button>
+                <ui:Button name="botonTiendaAnuncio" class="boton boton-acento boton--largo anuncio__accion">
+                    <ui:VisualElement class="ico ico-moneda ico-sm color-sobre-acento mr-xs" picking-mode="Ignore" />
+                    <ui:Label name="lblTiendaAnuncio" text="Ver anuncio: +25 monedas" class="boton__texto" picking-mode="Ignore" />
+                </ui:Button>
+                <ui:Label name="lblTiendaAnunciosHoy" text="Te quedan 10 anuncios hoy" class="texto-pequeno centrar-texto mt-sm" />
+            </ui:VisualElement>
+        </ui:VisualElement>
+
+        <!-- Anuncio a pantalla completa: entre niveles o con recompensa (1 pista) -->
+        <ui:VisualElement name="anuncioFondo" class="modal-fondo oculto">
+            <ui:VisualElement class="modal">
+                <ui:VisualElement class="fila">
+                    <ui:Label text="Anuncio" class="pastilla pastilla--suave" />
+                    <ui:VisualElement class="crecer" />
+                    <ui:Label name="anuncioCuenta" text="Puedes cerrar en 5" class="texto-pequeno" />
+                    <ui:Button name="anuncioCerrar" class="boton-icono boton-icono--plano ml-sm">
+                        <ui:VisualElement class="ico ico-cerrar ico-sm" picking-mode="Ignore" />
+                    </ui:Button>
+                </ui:VisualElement>
+                <ui:VisualElement class="anuncio__imagen mt-md">
+                    <ui:VisualElement name="anuncioIcono" class="ico ico-calendario ico-xxl color-acento" />
+                </ui:VisualElement>
+                <ui:Label name="anuncioTitulo" text="Acertijo diario" class="titulo centrar-texto mt-md" />
+                <ui:Label name="anuncioTexto" text="Un reto nuevo cada día y 150 puntos extra." class="texto-sec centrar-texto mt-xs" />
+                <ui:VisualElement name="anuncioBarraCont" class="barra mt-md">
+                    <ui:VisualElement name="anuncioBarra" class="barra__relleno barra__relleno--acento anuncio__barra" />
+                </ui:VisualElement>
+                <ui:Button name="anuncioAccion" text="Jugar ahora" class="boton boton-principal anuncio__accion" />
+            </ui:VisualElement>
+        </ui:VisualElement>
+
         <!-- Aviso emergente: logro obtenido o mensaje corto -->
         <ui:VisualElement name="toast" class="toast" picking-mode="Ignore">
             <ui:VisualElement class="toast__icono" picking-mode="Ignore">
@@ -31,6 +142,8 @@
                 <ui:Label name="toastTexto" text="Completaste 10 niveles sin pistas" class="texto-sec" picking-mode="Ignore" />
             </ui:VisualElement>
         </ui:VisualElement>
+
+    </ui:VisualElement>
 
     </ui:VisualElement>
 </ui:UXML>

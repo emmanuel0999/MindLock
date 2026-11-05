@@ -3,18 +3,20 @@ using System.Collections.Generic;
 namespace Mindlock.Datos
 {
     /// <summary>
-    /// Contenido de prueba: 30 acertijos de nivel, 7 diarios y los logros.
+    /// Contenido: 30 acertijos de nivel, 21 diarios y los logros.
     /// Sirve para probar la interfaz sin base de datos; Ezequiel puede
     /// reemplazar o ampliar estos acertijos (o cargarlos desde SQLite).
     /// </summary>
     public static partial class CatalogoAcertijos
     {
         /// <summary>
+        /// false (normal): niveles 1 a 15 originales y del 16 al 30 difíciles y cada vez más
+        /// complejos (CatalogoAcertijos.Progresivo.cs).
         /// true: del nivel 5 al 30 se usan los acertijos de CatalogoAcertijos.Desafio.cs
-        /// y las pistas restan más puntos. false: configuración original.
+        /// y las pistas restan más puntos.
         /// Lo asigna UIManager (casilla "Modo Desafio" del Inspector).
         /// </summary>
-        public static bool ModoDesafio = true;
+        public static bool ModoDesafio = false;
 
         // ------------------------------------------------------------------
         // Reglas por dificultad
@@ -23,7 +25,7 @@ namespace Mindlock.Datos
         public static Dificultad DificultadDe(int numero)
         {
             if (numero <= 8) return Dificultad.Facil;
-            if (numero <= 16) return Dificultad.Media;
+            if (numero < DificilesDesdeNivel) return Dificultad.Media;
             if (numero <= 24) return Dificultad.Dificil;
             return Dificultad.Experto;
         }
@@ -138,6 +140,7 @@ namespace Mindlock.Datos
             if (opciones != null) a.Opciones.AddRange(opciones);
             for (int i = 0; i < pistas.Length && i < Reglas.MaxPistasPorAcertijo; i++)
                 a.Pistas.Add(new Pista { Orden = i + 1, Texto = pistas[i] });
+            AplicarIngles(a);
             return a;
         }
 
@@ -151,8 +154,8 @@ namespace Mindlock.Datos
 
         public static List<Acertijo> AcertijosDeNiveles()
         {
+            if (!ModoDesafio) return AcertijosNormales();
             var lista = AcertijosOriginales();
-            if (!ModoDesafio) return lista;
             var desafio = AcertijosDesafio();
             for (int i = 0; i < desafio.Count; i++) lista[DesafioDesdeNivel - 1 + i] = desafio[i];
             return lista;
@@ -184,7 +187,7 @@ namespace Mindlock.Datos
                     new[] { "Manzana", "Pera", "Zanahoria", "Uva" },
                     "Piensa en qué tienen en común casi todas.", "Tres de ellas son frutas.", "Una crece bajo la tierra."),
 
-                // ---------- MEDIA (9-16) ----------
+                // ---------- MEDIA (9-16; en la configuración normal el 16 ya es difícil) ----------
                 Texto(9, L, "Un granjero tiene 17 ovejas. Todas menos 9 se escapan. ¿Cuántas le quedan?", "9;nueve;9 ovejas;nueve ovejas",
                     "Lee la frase con mucha atención.", "'Todas menos 9' significa que 9 no se escapan.", "No hace falta restar."),
                 Secuencia(10, T, "Completa los dos que faltan:\n3, 6, 12, 24, ?, ?", "48|96", new[] { "30", "36", "48", "72", "96" },
@@ -316,7 +319,7 @@ namespace Mindlock.Datos
 
         public static List<Logro> Logros()
         {
-            return new List<Logro>
+            var lista = new List<Logro>
             {
                 new Logro { Id = "primer-candado", Nombre = "Primer candado", Descripcion = "Completa el nivel 1.", Icono = "candado-abierto", Meta = 1 },
                 new Logro { Id = "mente-brillante", Nombre = "Mente brillante", Descripcion = "Completa 10 niveles sin usar pistas.", Icono = "bombilla", Meta = 10 },
@@ -328,6 +331,8 @@ namespace Mindlock.Datos
                 new Logro { Id = "medio-camino", Nombre = "Medio camino", Descripcion = "Completa 15 niveles.", Icono = "bandera", Meta = 15 },
                 new Logro { Id = "experto", Nombre = "Experto", Descripcion = "Completa el nivel 30.", Icono = "trofeo", Meta = 1 },
             };
+            AplicarIngles(lista);
+            return lista;
         }
     }
 }

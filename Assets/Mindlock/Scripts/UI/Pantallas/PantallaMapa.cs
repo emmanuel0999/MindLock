@@ -11,7 +11,8 @@ namespace Mindlock.UI
     {
         public override bool MuestraNavegacion { get { return true; } }
 
-        Label lblInicial, lblNombre, lblPuntaje, lblPistas, lblRacha;
+        Label lblInicial, lblNombre, lblPuntaje, lblPistas, lblRacha, lblVidas, lblVidasTiempo, lblMonedas;
+        IVisualElementScheduledItem relojVidas;
         Label lblFechaDiario, lblBonusDiario, lblEstadoDiario, lblProgreso;
         VisualElement barraProgreso, contenedorNiveles;
         ScrollView scroll;
@@ -37,6 +38,14 @@ namespace Mindlock.UI
             lblPuntaje = Q<Label>("lblPuntaje");
             lblPistas = Q<Label>("lblPistas");
             lblRacha = Q<Label>("lblRacha");
+            lblVidas = Q<Label>("lblVidas");
+            lblVidasTiempo = Q<Label>("lblVidasTiempo");
+            lblMonedas = Q<Label>("lblMonedas");
+            Boton("chipVidas", () => ui.Economia.AbrirVidas());
+            Boton("chipMonedas", () => ui.Economia.AbrirTienda());
+            ui.Economia.Cambio += () => { if (ui.PantallaActual == PantallaId.Mapa) PintarEconomia(); };
+            relojVidas = Raiz.schedule.Execute(PintarEconomia).Every(1000);
+            relojVidas.Pause();
             lblFechaDiario = Q<Label>("lblFechaDiario");
             lblBonusDiario = Q<Label>("lblBonusDiario");
             lblEstadoDiario = Q<Label>("lblEstadoDiario");
@@ -61,7 +70,7 @@ namespace Mindlock.UI
             {
                 if (nivelSeleccionado == null) return;
                 int numero = nivelSeleccionado.Numero;
-                UIUtil.CerrarModal(hojaNivel, () => ui.IrA(PantallaId.Juego, ParametrosJuego.DeNivel(numero)));
+                UIUtil.CerrarModal(hojaNivel, () => ui.JugarNivel(numero));
             });
 
             // Tocar el fondo oscuro también cierra la hoja
@@ -73,6 +82,18 @@ namespace Mindlock.UI
 
             pulso = Raiz.schedule.Execute(Pulsar).Every(900);
             pulso.Pause();
+        }
+
+        /// <summary>Vidas (con el tiempo para la próxima), monedas y pistas del encabezado.</summary>
+        void PintarEconomia()
+        {
+            var j = Sesion.Jugador;
+            if (j == null || Servicios.Economia == null) return;
+            int vidas = Servicios.Economia.Vidas(j.Id);
+            lblVidas.text = vidas.ToString();
+            lblVidasTiempo.text = vidas >= Economia.MaxVidas ? Idioma.T("Llenas") : Idioma.F("+1 en {0}", Formato.Cuenta(Servicios.Economia.TiempoParaVida(j.Id)));
+            lblMonedas.text = Formato.Numero(j.Monedas);
+            lblPistas.text = j.PistasDisponibles.ToString();
         }
 
         public override void AlMostrar(object datos)
@@ -88,18 +109,20 @@ namespace Mindlock.UI
             lblPuntaje.text = Formato.Numero(j.PuntajeTotal);
             lblPistas.text = j.PistasDisponibles.ToString();
             lblRacha.text = Servicios.Diario.RachaActual(j.Id).ToString();
+            PintarEconomia();
+            relojVidas.Resume();
 
             // Acertijo diario
             bool resuelto = Servicios.Diario.ResueltoHoy(j.Id);
             lblFechaDiario.text = Formato.Fecha(DateTime.Today);
-            lblBonusDiario.text = resuelto ? "Vuelve mañana por otro" : "+" + Reglas.BonusDiario + " pts bonus";
-            lblEstadoDiario.text = resuelto ? "Resuelto" : "Jugar";
+            lblBonusDiario.text = resuelto ? Idioma.T("Vuelve mañana por otro") : Idioma.F("+{0} pts bonus", Reglas.BonusDiario);
+            lblEstadoDiario.text = Idioma.T(resuelto ? "Resuelto" : "Jugar");
             lblEstadoDiario.EnableInClassList("pastilla--acento", !resuelto);
             lblEstadoDiario.EnableInClassList("pastilla--exito", resuelto);
 
             // Progreso general
             int completados = Servicios.Progreso.NivelesCompletados(j.Id);
-            lblProgreso.text = completados + " de " + Reglas.TotalNiveles + " niveles";
+            lblProgreso.text = Idioma.F("{0} de {1} niveles", completados, Reglas.TotalNiveles);
             barraProgreso.style.width = Length.Percent(100f * completados / Reglas.TotalNiveles);
 
             ConstruirNiveles(j);
@@ -116,6 +139,7 @@ namespace Mindlock.UI
         public override void AlOcultar()
         {
             pulso.Pause();
+            relojVidas.Pause();
         }
 
         public override bool AlPulsarAtras()
@@ -205,11 +229,11 @@ namespace Mindlock.UI
                     col.Add(UIUtil.Texto(Formato.Puntos(p.MejorPuntaje), "nodo__puntaje"));
                     break;
                 case EstadoNivel.Desbloqueado:
-                    col.Add(UIUtil.Texto("Jugar", "pastilla", "pastilla--accion", "mt-xs"));
+                    col.Add(UIUtil.Texto(Idioma.T("Jugar"), "pastilla", "pastilla--accion", "mt-xs"));
                     nodoActual = nodo;
                     break;
                 default:
-                    col.Add(UIUtil.Texto("Nivel " + n.Numero, "nodo__puntaje", "nodo__puntaje--tenue", "mt-xs"));
+                    col.Add(UIUtil.Texto(Idioma.F("Nivel {0}", n.Numero), "nodo__puntaje", "nodo__puntaje--tenue", "mt-xs"));
                     break;
             }
 
@@ -218,7 +242,7 @@ namespace Mindlock.UI
                 if (p.Estado == EstadoNivel.Bloqueado)
                 {
                     UIUtil.Sacudir(nodo);
-                    ui.MostrarAviso("Completa el nivel anterior para abrir este candado.", "candado");
+                    ui.MostrarAviso(Idioma.T("Completa el nivel anterior para abrir este candado."), "candado");
                 }
                 else
                 {
@@ -236,15 +260,15 @@ namespace Mindlock.UI
             nivelSeleccionado = n;
             var a = Servicios.Acertijos.ObtenerAcertijo(n.AcertijoId);
 
-            lblHojaTitulo.text = "Nivel " + n.Numero;
+            lblHojaTitulo.text = Idioma.F("Nivel {0}", n.Numero);
             UIUtil.Etiqueta(etqHojaDificultad, Formato.NombreDificultad(n.Dificultad), Formato.Clave(n.Dificultad));
             UIUtil.Etiqueta(etqHojaCategoria, Formato.NombreCategoria(a.Categoria), Formato.Clave(a.Categoria));
             lblHojaBase.text = Formato.Puntos(n.PuntajeBase);
-            lblHojaTiempo.text = n.TieneLimite ? Formato.Tiempo(n.TiempoLimite) : "Sin límite";
+            lblHojaTiempo.text = n.TieneLimite ? Formato.Tiempo(n.TiempoLimite) : Idioma.T("Sin límite");
             lblHojaMejor.text = p.Estado == EstadoNivel.Completado ? Formato.Puntos(p.MejorPuntaje) : "-";
             hojaEstrellas.Clear();
             hojaEstrellas.Add(UIUtil.Estrellas(p.Estrellas, "ico-md"));
-            botonEmpezar.text = p.Estado == EstadoNivel.Completado ? "Jugar de nuevo" : "Empezar";
+            botonEmpezar.text = Idioma.T(p.Estado == EstadoNivel.Completado ? "Jugar de nuevo" : "Empezar");
 
             UIUtil.AbrirModal(hojaNivel);
         }

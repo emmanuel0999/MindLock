@@ -37,6 +37,98 @@ namespace Mindlock.Datos
         }
 
         // ==================================================================
+        // CARPETA DE DATOS: en PC, .../LocalLow/Mindlock
+        // ==================================================================
+
+        /// <summary>Carpetas donde se guardó el progreso antes (empresa del proyecto), de la más nueva a la más vieja.</summary>
+        public static readonly string[] EmpresasAnteriores = { "Grupo3", "Unicaribe" };
+
+        /// <summary>
+        /// En PC Unity usa .../LocalLow/{empresa}/{producto}; el juego guarda un nivel más arriba,
+        /// en .../LocalLow/{producto}. En Android, iOS y web usa la carpeta de Unity tal cual.
+        /// </summary>
+        public static string Carpeta()
+        {
+            string unity = Application.persistentDataPath;
+#if UNITY_STANDALONE || UNITY_EDITOR
+            var empresa = Directory.GetParent(unity);
+            if (empresa != null && empresa.Parent != null) return Path.Combine(empresa.Parent.FullName, Application.productName);
+#endif
+            return unity;
+        }
+
+        /// <summary>
+        /// Si el progreso sigue en .../LocalLow/{empresa anterior}/{producto}, lo mueve a carpetaActual
+        /// (.../LocalLow/{producto}) y borra la carpeta vieja.
+        /// </summary>
+        public static bool TraerDeCarpetaAnterior(string carpetaActual)
+        {
+            try
+            {
+                var raiz = Directory.GetParent(Path.GetFullPath(carpetaActual));
+                if (raiz == null) return false;
+                string producto = Path.GetFileName(Path.GetFullPath(carpetaActual));
+                bool movido = false;
+                foreach (var empresa in EmpresasAnteriores)
+                    movido |= MoverDatos(Path.Combine(raiz.FullName, empresa, producto), carpetaActual);
+                return movido;
+            }
+            catch (Exception e)
+            {
+                Debug.LogWarning("[Mindlock] No se pudo traer el progreso de la carpeta anterior: " + e.Message);
+                return false;
+            }
+        }
+
+        /// <summary>Mueve el archivo principal y su copia .bak. Nunca pisa un progreso que ya exista en el destino.</summary>
+        public static bool MoverDatos(string origen, string destino)
+        {
+            string principal = Path.Combine(origen, NombreArchivo);
+            if (!File.Exists(principal) && !File.Exists(principal + ".bak"))
+            {
+                BorrarCarpetaAnterior(origen);   // sin progreso: solo quedan registros y cachés de Unity
+                return false;
+            }
+            if (File.Exists(Path.Combine(destino, NombreArchivo))) return false;
+
+            Directory.CreateDirectory(destino);
+            foreach (var nombre in new[] { NombreArchivo, NombreArchivo + ".bak" })
+            {
+                string de = Path.Combine(origen, nombre);
+                if (File.Exists(de)) File.Move(de, Path.Combine(destino, nombre));
+            }
+            Debug.Log("[Mindlock] Progreso movido de " + origen + " a " + destino);
+
+            BorrarCarpetaAnterior(origen);
+            return true;
+        }
+
+        /// <summary>
+        /// Borra la carpeta anterior (lo que queda son registros y cachés que Unity vuelve a crear)
+        /// y, si queda vacía, la de la empresa.
+        /// </summary>
+        static void BorrarCarpetaAnterior(string carpeta)
+        {
+            try
+            {
+                if (Directory.Exists(carpeta))
+                {
+                    Directory.Delete(carpeta, true);
+                    // En Windows el borrado puede tardar un instante en hacerse efectivo; si aun así
+                    // la carpeta de la empresa no queda vacía, se borra la próxima vez que se abra el juego
+                    for (int i = 0; i < 50 && Directory.Exists(carpeta); i++) System.Threading.Thread.Sleep(20);
+                }
+                var empresa = Directory.GetParent(carpeta);
+                if (empresa != null && Directory.Exists(empresa.FullName) && !Directory.EnumerateFileSystemEntries(empresa.FullName).Any())
+                    Directory.Delete(empresa.FullName);
+            }
+            catch (Exception e)
+            {
+                Debug.LogWarning("[Mindlock] No se pudo borrar la carpeta anterior " + carpeta + ": " + e.Message);
+            }
+        }
+
+        // ==================================================================
         // ACERTIJO DIARIO: uno fijo por fecha (tabla acertijo_diario)
         // ==================================================================
 
@@ -105,7 +197,13 @@ namespace Mindlock.Datos
                     PistasDisponibles = Mathf.Clamp(f.pistas_disponibles, 0, Reglas.MaxPistasAcumuladas),
                     RachaDiaria = Math.Max(0, f.racha_diaria),
                     UltimoDiario = LeerFecha(f.ultimo_diario),
-                    FechaCreacion = LeerFecha(f.fecha_creacion) ?? DateTime.Now
+                    FechaCreacion = LeerFecha(f.fecha_creacion) ?? DateTime.Now,
+                    Vidas = f.vidas < 0 ? Economia.MaxVidas : Mathf.Clamp(f.vidas, 0, Economia.MaxVidas),
+                    Monedas = Math.Max(0, f.monedas),
+                    RecargaVidaDesde = LeerFecha(f.recarga_vida_desde),
+                    AnunciosParaVida = Mathf.Clamp(f.anuncios_para_vida, 0, Economia.AnunciosPorVida - 1),
+                    AnunciosHoy = Math.Max(0, f.anuncios_hoy),
+                    FechaAnuncios = LeerFecha(f.fecha_anuncios)
                 };
                 jugadores.Add(j);
                 InicializarProgreso(j.Id);
@@ -258,7 +356,13 @@ namespace Mindlock.Datos
                     pistas_disponibles = j.PistasDisponibles,
                     racha_diaria = j.RachaDiaria,
                     ultimo_diario = EscribirFecha(j.UltimoDiario),
-                    racha_perdida = rachasPerdidas.Contains(j.Id)
+                    racha_perdida = rachasPerdidas.Contains(j.Id),
+                    vidas = j.Vidas,
+                    monedas = j.Monedas,
+                    recarga_vida_desde = EscribirFecha(j.RecargaVidaDesde),
+                    anuncios_para_vida = j.AnunciosParaVida,
+                    anuncios_hoy = j.AnunciosHoy,
+                    fecha_anuncios = EscribirFecha(j.FechaAnuncios)
                 });
 
                 foreach (var p in progreso[j.Id].Values.OrderBy(x => x.Numero))

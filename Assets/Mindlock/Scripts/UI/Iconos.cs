@@ -29,7 +29,7 @@ namespace Mindlock.UI
         {
             "candado", "candado-abierto", "estrella", "bombilla", "llama", "trofeo", "engranaje", "calendario",
             "reloj", "check", "flecha-izq", "flecha-der", "pausa", "mas", "cerrar", "repetir", "mapa", "rayo",
-            "diana", "cuadricula", "bandera", "usuario", "alerta", "anillo", "cerradura"
+            "diana", "cuadricula", "bandera", "usuario", "alerta", "anillo", "cerradura", "corazon", "moneda"
         };
 
         /// <summary>Activa todos los elementos con clase "ico" dentro de raiz.</summary>
@@ -274,6 +274,15 @@ namespace Mindlock.UI
                     p.lineWidth = s;
                     d.Poligono(true, 10f, 11f, 14f, 11f, 15.6f, 20.5f, 8.4f, 20.5f);
                     break;
+
+                case "corazon":
+                    d.Corazon(relleno);
+                    break;
+
+                case "moneda":
+                    d.Circulo(12f, 12f, 9f, relleno);
+                    d.Circulo(12f, 12f, 5f);
+                    break;
             }
         }
 
@@ -364,6 +373,19 @@ namespace Mindlock.UI
                 p.BezierCurveTo(P(15.5f, 9.8f), P(16f, 8.8f), P(16.2f, 7.6f));
                 p.BezierCurveTo(P(18.4f, 10f), P(19.4f, 12.8f), P(18.9f, 15.6f));
                 p.BezierCurveTo(P(18.3f, 19.4f), P(15.8f, 22f), P(12f, 22f));
+                p.ClosePath();
+                if (rellenar) p.Fill();
+                p.Stroke();
+            }
+
+            public void Corazon(bool rellenar)
+            {
+                p.BeginPath();
+                p.MoveTo(P(12f, 20.5f));
+                p.BezierCurveTo(P(5f, 15.5f), P(2.5f, 11.5f), P(3.2f, 8.2f));
+                p.BezierCurveTo(P(3.9f, 4.9f), P(8.4f, 3.6f), P(12f, 7.4f));
+                p.BezierCurveTo(P(15.6f, 3.6f), P(20.1f, 4.9f), P(20.8f, 8.2f));
+                p.BezierCurveTo(P(21.5f, 11.5f), P(19f, 15.5f), P(12f, 20.5f));
                 p.ClosePath();
                 if (rellenar) p.Fill();
                 p.Stroke();

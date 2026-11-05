@@ -18,6 +18,8 @@ namespace Mindlock
         public static ILogroService Logros { get; private set; }
         /// <summary>Opcional: null si la implementación no guarda el historial de intentos.</summary>
         public static IIntentoService Intentos { get; private set; }
+        /// <summary>Vidas y monedas. Opcional: null si la implementación no las tiene.</summary>
+        public static IEconomiaService Economia { get; private set; }
 
         public static bool Configurados { get { return Perfiles != null; } }
 
@@ -30,6 +32,7 @@ namespace Mindlock
             Diario = diario;
             Logros = logros;
             Intentos = perfiles as IIntentoService;
+            Economia = perfiles as IEconomiaService;
         }
 
         public static void UsarMemoria(bool datosDeDemo)
@@ -81,5 +84,7 @@ namespace Mindlock
         public static int Tema { get { return PlayerPrefs.GetInt("mindlock.tema", TemaOscuro); } set { Guardar("mindlock.tema", value); } }
         public static int TamanoTexto { get { return PlayerPrefs.GetInt("mindlock.tamanoTexto", TextoNormal); } set { Guardar("mindlock.tamanoTexto", value); } }
         public static int Paleta { get { return PlayerPrefs.GetInt("mindlock.paleta", PaletaClasica); } set { Guardar("mindlock.paleta", value); } }
+        /// <summary>Idioma.Ingles (por defecto) o Idioma.Espanol.</summary>
+        public static int Idioma { get { return PlayerPrefs.GetInt("mindlock.idioma", Mindlock.Idioma.Ingles); } set { Guardar("mindlock.idioma", value); } }
     }
 }

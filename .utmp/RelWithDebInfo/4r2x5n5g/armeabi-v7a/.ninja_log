@@ -1,0 +1,12 @@
+# ninja log v5
+60	204	8155452018636198	FramePacing/CMakeFiles/swappywrapper.dir/UnitySwappyWrapper.cpp.o	ebac9d98f36c8052
+206	364	8155452020207125	C:/Universidad/Octubre/Mindlock/Library/Bee/Android/Prj/IL2CPP/Gradle/unityLibrary/build/intermediates/cxx/RelWithDebInfo/4r2x5n5g/obj/armeabi-v7a/libswappywrapper.so	341e8e06ed9aa23
+19	978	8155452026337005	GameActivity/CMakeFiles/game.dir/UGAEntry.cpp.o	4cb3eff3f2fb5f71
+0	989	8155452026447815	GameActivity/CMakeFiles/game.dir/UGAConfiguration.cpp.o	f6c93a59172cb05
+26	995	8155452026498437	GameActivity/CMakeFiles/game.dir/UGAInputKeyEvent.cpp.o	910fc083bc2d89ba
+13	1056	8155452027139318	GameActivity/CMakeFiles/game.dir/UGADebug.cpp.o	53c694d393247fe5
+52	1083	8155452027411957	GameActivity/CMakeFiles/game.dir/UGAInputMotionEvent.cpp.o	739fae685dc5da49
+43	1134	8155452027914377	GameActivity/CMakeFiles/game.dir/UGASoftKeyboard.cpp.o	97f08328e3baa1b0
+34	1236	8155452028927102	GameActivity/CMakeFiles/game.dir/UGAInput.cpp.o	b4399c3858bae9b8
+7	1285	8155452029401873	GameActivity/CMakeFiles/game.dir/UGAApplication.cpp.o	dd14536c49f8833c
+1286	1376	8155452030356238	C:/Universidad/Octubre/Mindlock/Library/Bee/Android/Prj/IL2CPP/Gradle/unityLibrary/build/intermediates/cxx/RelWithDebInfo/4r2x5n5g/obj/armeabi-v7a/libgame.so	693a5ca0358cc80b

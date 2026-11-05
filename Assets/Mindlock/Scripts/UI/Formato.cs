@@ -10,6 +10,8 @@ namespace Mindlock.UI
         static readonly NumberFormatInfo Numeros = new NumberFormatInfo { NumberGroupSeparator = " ", NumberDecimalDigits = 0 };
         static readonly string[] NombresDias = { "Domingo", "Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado" };
         static readonly string[] NombresMeses = { "enero", "febrero", "marzo", "abril", "mayo", "junio", "julio", "agosto", "septiembre", "octubre", "noviembre", "diciembre" };
+        static readonly string[] DaysEn = { "Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday" };
+        static readonly string[] MonthsEn = { "January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December" };
 
         public static string Numero(int n) { return n.ToString("#,0", Numeros); }
 
@@ -21,6 +23,14 @@ namespace Mindlock.UI
             return (segundos / 60).ToString("00") + ":" + (segundos % 60).ToString("00");
         }
 
+        /// <summary>Cuenta regresiva corta: "49:59" (o "1:02:05" si pasa de una hora).</summary>
+        public static string Cuenta(TimeSpan t)
+        {
+            if (t.TotalSeconds < 0) t = TimeSpan.Zero;
+            int s = (int)Math.Ceiling(t.TotalSeconds);
+            return s >= 3600 ? TiempoLargo(TimeSpan.FromSeconds(s)) : (s / 60) + ":" + (s % 60).ToString("00");
+        }
+
         public static string TiempoLargo(TimeSpan t)
         {
             if (t.TotalSeconds < 0) t = TimeSpan.Zero;
@@ -29,16 +39,19 @@ namespace Mindlock.UI
 
         public static string Fecha(DateTime f)
         {
+            if (Idioma.EsIngles) return DaysEn[(int)f.DayOfWeek] + ", " + MonthsEn[f.Month - 1] + " " + f.Day;
             return NombresDias[(int)f.DayOfWeek] + " " + f.Day + " de " + NombresMeses[f.Month - 1];
         }
 
         public static string FechaCorta(DateTime f)
         {
+            if (Idioma.EsIngles) return MonthsEn[f.Month - 1].Substring(0, 3) + " " + f.Day + ", " + f.Year;
             return f.Day.ToString("00") + "/" + f.Month.ToString("00") + "/" + f.Year;
         }
 
         public static string Racha(int dias)
         {
+            if (Idioma.EsIngles) return dias == 1 ? "1-day streak" : dias + "-day streak";
             return dias == 1 ? "1 día seguido" : dias + " días seguidos";
         }
 
@@ -46,10 +59,10 @@ namespace Mindlock.UI
         {
             switch (d)
             {
-                case Dificultad.Facil: return "Fácil";
-                case Dificultad.Media: return "Media";
-                case Dificultad.Dificil: return "Difícil";
-                default: return "Experto";
+                case Dificultad.Facil: return Idioma.T("Fácil");
+                case Dificultad.Media: return Idioma.T("Media");
+                case Dificultad.Dificil: return Idioma.T("Difícil");
+                default: return Idioma.T("Experto");
             }
         }
 
@@ -57,9 +70,9 @@ namespace Mindlock.UI
         {
             switch (c)
             {
-                case Categoria.Logica: return "Lógica";
-                case Categoria.Palabras: return "Palabras";
-                default: return "Patrones";
+                case Categoria.Logica: return Idioma.T("Lógica");
+                case Categoria.Palabras: return Idioma.T("Palabras");
+                default: return Idioma.T("Patrones");
             }
         }
 

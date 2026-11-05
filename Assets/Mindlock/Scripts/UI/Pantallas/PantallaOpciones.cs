@@ -7,9 +7,16 @@ namespace Mindlock.UI
     /// <summary>PANTALLA 9 - Opciones (sonido, pantalla, juego, perfil, acerca de).</summary>
     public class PantallaOpciones : Pantalla
     {
+        public const string Empresa = "Frailes City Studios";
+        public const string Contacto = "frailescitystudios@gmail.com";
+        public const string UrlPolitica = "https://sites.google.com/view/frailes-city-studios/privacy-policy";
+        public const string UrlTerminos = "https://sites.google.com/view/frailes-city-studios/terms";
+
+        Button botonTerminos, botonPreferenciasAnuncios;
+
         public override bool MuestraNavegacion { get { return true; } }
 
-        Button[] segTema, segTexto, segPaleta;
+        Button[] segTema, segTexto, segPaleta, segIdioma;
         Label lblJugadorActual, lblConfirmarNombre;
         VisualElement modalReiniciar, pasoAdvertencia, pasoConfirmar;
         TextField campoConfirmar;
@@ -26,7 +33,31 @@ namespace Mindlock.UI
             UIUtil.OcultarBarras(Q<ScrollView>("scrollOpciones"));
 
             var version = Q<Label>("lblVersion");
-            if (version != null) version.text = "Versión " + Application.version;
+            if (version != null) version.text = Idioma.F("Versión {0}", Application.version);
+
+            // Acerca de: el correo abre la app de correo del dispositivo
+            Q<Label>("lblContacto").text = Contacto;
+            Q<Label>("lblDerechos").text = "© " + DateTime.Today.Year + " " + Empresa;
+            Boton("botonContacto", () => Application.OpenURL("mailto:" + Contacto + "?subject=Mindlock"));
+
+            // Privacidad
+            Boton("botonPolitica", () => Application.OpenURL(UrlPolitica));
+            botonTerminos = Boton("botonTerminos", () => Application.OpenURL(UrlTerminos));
+            botonPreferenciasAnuncios = Boton("botonPreferenciasAnuncios", () =>
+                ConsentimientoAnuncios.MostrarOpciones(ConsentimientoAnuncios.AplicarALevelPlay));
+
+            // Idioma: al cambiarlo se vuelven a crear todas las pantallas
+            segIdioma = new[] { Q<Button>("segIdiomaIngles"), Q<Button>("segIdiomaEspanol") };
+            for (int i = 0; i < segIdioma.Length; i++)
+            {
+                int valor = i == 0 ? Idioma.Ingles : Idioma.Espanol;
+                segIdioma[i].clicked += () =>
+                {
+                    if (valor == Idioma.Actual) return;
+                    Idioma.Cambiar(valor);
+                    ui.CambiarIdioma();
+                };
+            }
 
             // Interruptores (se guardan al instante en el dispositivo)
             UIUtil.Interruptor(Q<VisualElement>("filaMusica"), Preferencias.Musica, v =>
@@ -81,6 +112,12 @@ namespace Mindlock.UI
             MarcarSegmentos(segTema, Preferencias.Tema);
             MarcarSegmentos(segTexto, Preferencias.TamanoTexto);
             MarcarSegmentos(segPaleta, Preferencias.Paleta);
+            MarcarSegmentos(segIdioma, Idioma.EsIngles ? 0 : 1);
+
+            // "Preferencias de anuncios" solo donde el jugador debe poder cambiar su decisión (Europa, Reino Unido, Suiza)
+            bool preferencias = ConsentimientoAnuncios.OpcionesDisponibles;
+            UIUtil.Mostrar(botonPreferenciasAnuncios, preferencias);
+            botonTerminos.EnableInClassList("fila-opcion--ultima", !preferencias);
         }
 
         public override bool AlPulsarAtras()
@@ -113,7 +150,7 @@ namespace Mindlock.UI
         void AbrirReinicio()
         {
             if (Sesion.Jugador == null) return;
-            lblConfirmarNombre.text = "Escribe «" + Sesion.Jugador.Nombre + "» para confirmar.";
+            lblConfirmarNombre.text = Idioma.F("Escribe «{0}» para confirmar.", Sesion.Jugador.Nombre);
             UIUtil.Mostrar(pasoAdvertencia);
             UIUtil.Ocultar(pasoConfirmar);
             UIUtil.AbrirModal(modalReiniciar);
@@ -131,7 +168,7 @@ namespace Mindlock.UI
             Servicios.Perfiles.ReiniciarProgreso(Sesion.Jugador.Id);
             UIUtil.CerrarModal(modalReiniciar, () =>
             {
-                ui.MostrarAviso("Progreso reiniciado. ¡A empezar de nuevo!", "repetir");
+                ui.MostrarAviso(Idioma.T("Progreso reiniciado. ¡A empezar de nuevo!"), "repetir");
                 ui.IrA(PantallaId.Mapa);
             });
         }

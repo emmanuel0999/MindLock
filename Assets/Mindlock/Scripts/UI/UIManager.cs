@@ -8,7 +8,7 @@ namespace Mindlock.UI
 {
     /// <summary>
     /// Controla toda la interfaz: carga las pantallas, cambia de una a otra,
-    /// aplica tema y tamaño de texto, área segura y avisos emergentes.
+    /// aplica tema y tamaño de texto, área segura, anuncios y avisos emergentes.
     /// Va en un GameObject con UIDocument (es el único script que hay que agregar).
     /// </summary>
     [RequireComponent(typeof(UIDocument))]
@@ -20,11 +20,20 @@ namespace Mindlock.UI
         [Tooltip("Usa perfiles de ejemplo (Ana y Carlos) en memoria, sin guardar. Desmarcado: el progreso se guarda en el dispositivo.")]
         [SerializeField] bool usarDatosDeDemo = false;
 
-        [Tooltip("Acertijos muy difíciles del nivel 5 al 30 y pistas que restan más puntos. Desmarcado: configuración original.")]
-        [SerializeField] bool modoDesafio = true;
+        [Tooltip("Acertijos muy difíciles del nivel 5 al 30 y pistas que restan más puntos. Desmarcado: niveles 1-15 originales y 16-30 difíciles y cada vez más complejos.")]
+        [SerializeField] bool modoDesafio = false;
+
+        [Tooltip("Banner y anuncios del juego (entre niveles y para ganar pistas). Desmarcado: sin anuncios.")]
+        [SerializeField] bool mostrarAnuncios = true;
 
         UIDocument documento;
-        VisualElement app, contenedor, barraNavegacion, toast, toastIcono;
+        VisualElement marco, app, contenedor, barraNavegacion, toast, toastIcono;
+        AnunciosDemo anunciosDemo;
+        AnunciosLevelPlay anunciosLevelPlay;
+        PanelEconomia economia;
+
+        /// <summary>Ventanas de vidas y tienda.</summary>
+        public PanelEconomia Economia { get { return economia; } }
         Label toastTitulo, toastNombre, toastTexto;
         Button tabNiveles, tabLogros, tabOpciones;
 
@@ -35,7 +44,6 @@ namespace Mindlock.UI
         struct Aviso { public string Titulo, Nombre, Texto, Icono; public bool EsLogro; }
         readonly Queue<Aviso> avisos = new Queue<Aviso>();
         bool mostrandoAviso;
-        float margenSuperior;
 
         public PantallaId PantallaActual { get { return idActual; } }
 
@@ -49,7 +57,12 @@ namespace Mindlock.UI
             if (!Servicios.Configurados)
             {
                 if (usarDatosDeDemo) Servicios.UsarMemoria(true);
-                else Servicios.UsarArchivo(System.IO.Path.Combine(Application.persistentDataPath, ArchivoJuegoService.NombreArchivo));
+                else
+                {
+                    string carpeta = ArchivoJuegoService.Carpeta();
+                    ArchivoJuegoService.TraerDeCarpetaAnterior(carpeta);
+                    Servicios.UsarArchivo(System.IO.Path.Combine(carpeta, ArchivoJuegoService.NombreArchivo));
+                }
             }
             Application.targetFrameRate = 60;
             Sonidos.Inicializar(gameObject);
@@ -78,9 +91,9 @@ namespace Mindlock.UI
             var ps = ScriptableObject.CreateInstance<PanelSettings>();
             ps.themeStyleSheet = Resources.Load<ThemeStyleSheet>(RutaTema);
             ps.scaleMode = PanelScaleMode.ScaleWithScreenSize;
-            ps.referenceResolution = new Vector2Int(390, 844);
-            ps.screenMatchMode = PanelScreenMatchMode.MatchWidthOrHeight;
-            ps.match = 0.5f;
+            // Expand: el panel nunca mide menos de 390 x 760, en vertical u horizontal
+            ps.referenceResolution = new Vector2Int(390, 760);
+            ps.screenMatchMode = PanelScreenMatchMode.Expand;
             return ps;
         }
 
@@ -97,7 +110,9 @@ namespace Mindlock.UI
             var plantilla = Cargar("Raiz");
             if (plantilla == null) return;
             plantilla.CloneTree(raiz);
+            Idioma.Traducir(raiz);
 
+            marco = raiz.Q("marco");
             app = raiz.Q("app");
             contenedor = raiz.Q("contenedorPantallas");
             barraNavegacion = raiz.Q("barraNavegacion");
@@ -124,6 +139,10 @@ namespace Mindlock.UI
             tabLogros.clicked += () => IrA(PantallaId.Logros);
             tabOpciones.clicked += () => IrA(PantallaId.Opciones);
 
+            // Antes de las pantallas: el mapa, el juego y el resultado usan los anuncios y la economía al prepararse
+            Anuncios.Configurar(mostrarAnuncios ? CrearAnuncios() : null);
+            economia = new PanelEconomia(this, app);
+
             Registrar(PantallaId.Perfil, "Perfil", new PantallaPerfil());
             Registrar(PantallaId.Mapa, "Mapa", new PantallaMapa());
             Registrar(PantallaId.Juego, "Juego", new PantallaJuego());
@@ -132,8 +151,47 @@ namespace Mindlock.UI
             Registrar(PantallaId.Logros, "Logros", new PantallaLogros());
             Registrar(PantallaId.Opciones, "Opciones", new PantallaOpciones());
 
-            UIUtil.AplicarSafeArea(app, arriba => margenSuperior = arriba);
+            UIUtil.AplicarSafeArea(marco);
+            // En pantallas anchas la app queda como una columna centrada con bordes
+            marco.RegisterCallback<GeometryChangedEvent>(_ =>
+                app.EnableInClassList("app--columna", app.layout.width + 1f < marco.contentRect.width));
             AplicarPreferencias();
+        }
+
+        /// <summary>
+        /// En Android e iOS con ClavesAnuncios configuradas: LevelPlay (Unity Ads y AdMob).
+        /// En el editor, la web, PC o sin claves: los anuncios propios del juego.
+        /// </summary>
+        IProveedorAnuncios CrearAnuncios()
+        {
+#if (UNITY_ANDROID || UNITY_IOS) && !UNITY_EDITOR
+            if (ClavesAnuncios.Configuradas)
+            {
+                // LevelPlay se inicia una sola vez; al reconstruir la interfaz solo se vuelve a enlazar el banner
+                if (anunciosLevelPlay == null) anunciosLevelPlay = new AnunciosLevelPlay(this, app);
+                else anunciosLevelPlay.Enlazar(app);
+                return anunciosLevelPlay;
+            }
+#endif
+            anunciosDemo = new AnunciosDemo(this, app);
+            return anunciosDemo;
+        }
+
+        /// <summary>Vuelve a crear todas las pantallas con el idioma nuevo y regresa a Opciones.</summary>
+        public void CambiarIdioma()
+        {
+            if (actual != null) actual.AlOcultar();
+            actual = null;
+            avisos.Clear();
+            mostrandoAviso = false;
+            Construir();
+            IrA(Sesion.Jugador != null ? PantallaId.Opciones : PantallaId.Perfil);
+        }
+
+        /// <summary>Abre un nivel si quedan vidas; si no, muestra la ventana de vidas.</summary>
+        public void JugarNivel(int numero, Action alCancelar = null)
+        {
+            economia.ConVida(() => IrA(PantallaId.Juego, ParametrosJuego.DeNivel(numero)), alCancelar);
         }
 
         VisualTreeAsset Cargar(string nombre)
@@ -150,6 +208,7 @@ namespace Mindlock.UI
             if (asset == null) return;
 
             var contenido = asset.Instantiate();
+            Idioma.Traducir(contenido);
             contenido.AddToClassList("contenedor-pantalla");
             contenido.style.display = DisplayStyle.None;
             contenedor.Add(contenido);
@@ -185,6 +244,8 @@ namespace Mindlock.UI
             idActual = id;
 
             UIUtil.Mostrar(barraNavegacion, nueva.MuestraNavegacion);
+            // El banner nunca tapa el acertijo
+            Anuncios.MostrarBanner(id != PantallaId.Juego);
             tabNiveles.EnableInClassList("tab--activa", id == PantallaId.Mapa);
             tabLogros.EnableInClassList("tab--activa", id == PantallaId.Logros);
             tabOpciones.EnableInClassList("tab--activa", id == PantallaId.Opciones);
@@ -201,7 +262,10 @@ namespace Mindlock.UI
         {
 #if ENABLE_LEGACY_INPUT_MANAGER
             // Botón "atrás" de Android
-            if (Input.GetKeyDown(KeyCode.Escape) && actual != null && !actual.AlPulsarAtras())
+            if (!Input.GetKeyDown(KeyCode.Escape) || actual == null) return;
+            if (anunciosDemo != null && anunciosDemo.AlPulsarAtras()) return;
+            if (economia != null && economia.AlPulsarAtras()) return;
+            if (!actual.AlPulsarAtras())
             {
                 if (idActual != PantallaId.Mapa && idActual != PantallaId.Perfil) IrA(PantallaId.Mapa);
             }
@@ -214,16 +278,17 @@ namespace Mindlock.UI
 
         public void AplicarPreferencias()
         {
-            if (app == null) return;
+            if (marco == null) return;
             int tema = Preferencias.Tema;
             int hora = DateTime.Now.Hour;
             bool claro = tema == Preferencias.TemaClaro || (tema == Preferencias.TemaAutomatico && hora >= 7 && hora < 19);
 
-            app.EnableInClassList("tema-claro", claro);
-            app.EnableInClassList("escala-texto--pequena", Preferencias.TamanoTexto == Preferencias.TextoPequeno);
-            app.EnableInClassList("escala-texto--grande", Preferencias.TamanoTexto == Preferencias.TextoGrande);
-            app.EnableInClassList("paleta-oceano", Preferencias.Paleta == Preferencias.PaletaOceano);
-            app.EnableInClassList("paleta-aurora", Preferencias.Paleta == Preferencias.PaletaAurora);
+            // En el marco, para que el fondo a los lados de la app también cambie
+            marco.EnableInClassList("tema-claro", claro);
+            marco.EnableInClassList("escala-texto--pequena", Preferencias.TamanoTexto == Preferencias.TextoPequeno);
+            marco.EnableInClassList("escala-texto--grande", Preferencias.TamanoTexto == Preferencias.TextoGrande);
+            marco.EnableInClassList("paleta-oceano", Preferencias.Paleta == Preferencias.PaletaOceano);
+            marco.EnableInClassList("paleta-aurora", Preferencias.Paleta == Preferencias.PaletaAurora);
 
             app.schedule.Execute(() => Iconos.Repintar(app)).StartingIn(30);
         }
@@ -246,7 +311,7 @@ namespace Mindlock.UI
             app.schedule.Execute(() =>
             {
                 foreach (var l in copia)
-                    avisos.Enqueue(new Aviso { Titulo = "¡Logro obtenido!", Nombre = l.Nombre, Texto = l.Descripcion, Icono = l.Icono, EsLogro = true });
+                    avisos.Enqueue(new Aviso { Titulo = Idioma.T("¡Logro obtenido!"), Nombre = l.NombreVisible, Texto = l.DescripcionVisible, Icono = l.Icono, EsLogro = true });
                 ProcesarAvisos();
             }).StartingIn(retrasoMs);
         }
@@ -269,7 +334,7 @@ namespace Mindlock.UI
             toastTexto.text = a.Texto ?? "";
             UIUtil.Mostrar(toastTexto, !string.IsNullOrEmpty(a.Texto));
             Iconos.Cambiar(toastIcono, string.IsNullOrEmpty(a.Icono) ? "trofeo" : a.Icono);
-            toast.style.top = margenSuperior + 12f;
+            toast.style.top = 12f;
             toast.BringToFront();
 
             toast.AddToClassList("toast--visible");

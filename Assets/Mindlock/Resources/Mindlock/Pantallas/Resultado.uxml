@@ -25,6 +25,13 @@
 
                 <ui:Label name="lblPuntajeResultado" text="650 pts" class="numero-grande mt-sm" />
                 <ui:Label name="insigniaRecord" text="¡Nuevo récord!" class="pastilla pastilla--acento mt-xs oculto" />
+                <ui:VisualElement name="avisoMonedas" class="aviso aviso--acento mt-md aviso-monedas oculto">
+                    <ui:VisualElement class="ico ico-moneda ico-md color-acento" />
+                    <ui:Label name="lblMonedasResultado" text="Ganaste 30 monedas" class="aviso__texto texto-acento crecer" />
+                    <ui:Button name="botonDuplicar" class="boton-duplicar">
+                        <ui:Label text="Ver video: x2" class="boton-duplicar__texto" picking-mode="Ignore" />
+                    </ui:Button>
+                </ui:VisualElement>
             </ui:VisualElement>
 
             <!-- Desglose -->
@@ -65,14 +72,14 @@
 
         <!-- Botones -->
         <ui:Button name="botonSiguiente" text="Siguiente nivel" class="boton boton-principal mt-md" />
-        <ui:VisualElement class="fila mt-sm">
+        <ui:VisualElement class="fila mt-sm resultado-botones">
             <ui:Button name="botonRepetir" class="boton boton-suave crecer mr-sm">
                 <ui:VisualElement class="ico ico-repetir ico-md" picking-mode="Ignore" />
                 <ui:Label text="Repetir" class="boton__texto" picking-mode="Ignore" />
             </ui:Button>
-            <ui:Button name="botonMapaResultado" class="boton boton-suave crecer ml-sm">
+            <ui:Button name="botonMapaResultado" class="boton boton-suave boton--largo crecer ml-sm resultado-mapa">
                 <ui:VisualElement class="ico ico-mapa ico-md" picking-mode="Ignore" />
-                <ui:Label text="Mapa" class="boton__texto" picking-mode="Ignore" />
+                <ui:Label text="Volver al mapa" class="boton__texto" picking-mode="Ignore" />
             </ui:Button>
         </ui:VisualElement>
 

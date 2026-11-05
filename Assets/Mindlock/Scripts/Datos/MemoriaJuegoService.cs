@@ -10,7 +10,7 @@ namespace Mindlock.Datos
     /// para probar la interfaz; ArchivoJuegoService hereda de esta clase y
     /// guarda cada cambio en el dispositivo (ver Guardar()).
     /// </summary>
-    public class MemoriaJuegoService : IPerfilService, IProgresoService, IAcertijoService, IDiarioService, ILogroService, IIntentoService
+    public partial class MemoriaJuegoService : IPerfilService, IProgresoService, IAcertijoService, IDiarioService, ILogroService, IIntentoService, IEconomiaService
     {
         protected readonly List<Jugador> jugadores = new List<Jugador>();
         protected readonly List<Nivel> niveles = new List<Nivel>();
@@ -88,6 +88,8 @@ namespace Mindlock.Datos
             j.PistasDisponibles = Reglas.PistasIniciales;
             j.RachaDiaria = 0;
             j.UltimoDiario = null;
+            j.Monedas = 0;
+            LlenarVidas(j);
             rachasPerdidas.Remove(jugadorId);
             intentos.RemoveAll(i => i.JugadorId == jugadorId);
             InicializarProgreso(jugadorId);
@@ -139,6 +141,15 @@ namespace Mindlock.Datos
             return true;
         }
 
+        public bool GanarPista(int jugadorId)
+        {
+            var j = ObtenerPerfil(jugadorId);
+            if (j == null || j.PistasDisponibles >= Reglas.MaxPistasAcumuladas) return false;
+            j.PistasDisponibles++;
+            Guardar();
+            return true;
+        }
+
         public ResultadoNivel RegistrarNivel(int jugadorId, ResultadoIntento intento)
         {
             var jugador = ObtenerPerfil(jugadorId);
@@ -154,6 +165,9 @@ namespace Mindlock.Datos
                 jugador.PuntajeTotal += r.Puntaje - p.MejorPuntaje;
                 p.MejorPuntaje = r.Puntaje;
             }
+
+            // Monedas solo por estrellas nuevas (repetir un nivel ya hecho no da más)
+            r.MonedasGanadas = Math.Max(0, r.Estrellas - p.Estrellas) * Economia.MonedasPorEstrella;
 
             // Primera vez con 3 estrellas en este nivel: +1 pista
             if (r.Estrellas == 3 && p.Estrellas < 3 && jugador.PistasDisponibles < Reglas.MaxPistasAcumuladas)
@@ -180,6 +194,8 @@ namespace Mindlock.Datos
             }
 
             r.LogrosNuevos = EvaluarLogros(jugadorId, DateTime.Now);
+            r.MonedasGanadas += r.LogrosNuevos.Count * Economia.MonedasPorLogro;
+            jugador.Monedas += r.MonedasGanadas;
             AnotarAcierto(jugadorId, nivel.AcertijoId, intento, r.Puntaje);
             return r;
         }
@@ -267,6 +283,7 @@ namespace Mindlock.Datos
                 diasDiario[jugadorId].Add(DateTime.Today);
                 rachasPerdidas.Remove(jugadorId);
                 j.PuntajeTotal += r.Puntaje;
+                r.MonedasGanadas = Economia.MonedasDiario;
                 if (j.PistasDisponibles < Reglas.MaxPistasAcumuladas)
                 {
                     j.PistasDisponibles++;
@@ -276,6 +293,8 @@ namespace Mindlock.Datos
 
             r.Racha = j.RachaDiaria;
             r.LogrosNuevos = EvaluarLogros(jugadorId, DateTime.Now);
+            r.MonedasGanadas += r.LogrosNuevos.Count * Economia.MonedasPorLogro;
+            j.Monedas += r.MonedasGanadas;
             AnotarAcierto(jugadorId, diario.Acertijo.Id, intento, r.Puntaje);
             return r;
         }

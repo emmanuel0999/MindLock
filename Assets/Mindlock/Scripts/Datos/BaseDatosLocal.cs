@@ -40,6 +40,12 @@ namespace Mindlock.Datos
         public int racha_diaria;
         public string ultimo_diario;      // auxiliar
         public bool racha_perdida;        // auxiliar
+        public int vidas = -1;            // -1: archivo anterior a las vidas (empieza con el máximo)
+        public int monedas;
+        public string recarga_vida_desde;
+        public int anuncios_para_vida;
+        public int anuncios_hoy;
+        public string fecha_anuncios;
     }
 
     /// <summary>2. NIVEL</summary>

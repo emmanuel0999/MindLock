@@ -25,8 +25,10 @@ namespace Mindlock.UI
         VisualElement zonaTexto, zonaOpciones, zonaSecuencia, casillasCont, fichasCont, franja, franjaIcono;
         TextField campoRespuesta;
         ScrollView scroll;
-        Button botonComprobar, botonSugerencia;
+        Button botonComprobar, botonSugerencia, botonVerAnuncio, botonComprarPista;
 
+        VisualElement modalSalir, icoSalir;
+        Label lblAvisoSalir, lblSalirTexto, lblSalirVidas;
         VisualElement modalPausa, modalPista, modalTiempo, estadoConfirmar, estadoLista, estadoSinPistas, listaPistas;
         Label lblConfirmarTitulo, lblConfirmarTexto, lblPuntosAntes, lblPuntosDespues, lblPistasGlobales, lblSinPistas, lblSinPistasDetalle;
 
@@ -80,6 +82,11 @@ namespace Mindlock.UI
             lblBotonPista = Q<Label>("lblBotonPista");
 
             modalPausa = Q<VisualElement>("modalPausa");
+            modalSalir = Q<VisualElement>("modalSalir");
+            icoSalir = Q<VisualElement>("icoSalir");
+            lblAvisoSalir = Q<Label>("lblAvisoSalir");
+            lblSalirTexto = Q<Label>("lblSalirTexto");
+            lblSalirVidas = Q<Label>("lblSalirVidas");
             modalPista = Q<VisualElement>("modalPista");
             modalTiempo = Q<VisualElement>("modalTiempo");
             estadoConfirmar = Q<VisualElement>("estadoConfirmar");
@@ -105,20 +112,27 @@ namespace Mindlock.UI
             // Pausa
             Boton("botonContinuar", CerrarPausa);
             Boton("botonReiniciar", () => UIUtil.CerrarModal(modalPausa, Preparar));
-            Boton("botonSalir", () => UIUtil.CerrarModal(modalPausa, Salir));
+            Boton("botonSalir", () => UIUtil.CerrarModal(modalPausa, PreguntarSalir));
+
+            // Confirmar salida
+            Boton("botonQuedarme", () => UIUtil.CerrarModal(modalSalir, Reanudar));
+            Boton("botonConfirmarSalir", ConfirmarSalir);
 
             // Pistas
             Boton("botonCancelarPista", () => UIUtil.CerrarModal(modalPista));
             Boton("botonVerPista", RevelarPista);
             Boton("botonVolverAcertijo", () => UIUtil.CerrarModal(modalPista));
             Boton("botonEntendido", () => UIUtil.CerrarModal(modalPista));
+            botonVerAnuncio = Boton("botonVerAnuncio", VerAnuncioPorPista);
+            botonComprarPista = Boton("botonComprarPista", ComprarPista);
+            Q<Label>("lblComprarPista").text = Idioma.F("Comprar pista: {0} monedas", Economia.PrecioPista);
 
             // Tiempo agotado
-            Boton("botonReintentar", () => UIUtil.CerrarModal(modalTiempo, Preparar));
+            Boton("botonReintentar", () => UIUtil.CerrarModal(modalTiempo, () => ui.Economia.ConVida(Preparar, Salir)));
             Boton("botonTiempoMapa", () => UIUtil.CerrarModal(modalTiempo, Salir));
 
             // Respuesta de texto
-            UIUtil.Placeholder(campoRespuesta, "Escribe tu respuesta");
+            UIUtil.Placeholder(campoRespuesta, Idioma.T("Escribe tu respuesta"));
             campoRespuesta.RegisterValueChangedCallback(_ => OcultarFranja());
             campoRespuesta.RegisterCallback<KeyDownEvent>(e =>
             {
@@ -153,6 +167,7 @@ namespace Mindlock.UI
         {
             reloj.Pause();
             UIUtil.CerrarModalInmediato(modalPausa);
+            UIUtil.CerrarModalInmediato(modalSalir);
             UIUtil.CerrarModalInmediato(modalPista);
             UIUtil.CerrarModalInmediato(modalTiempo);
         }
@@ -160,6 +175,7 @@ namespace Mindlock.UI
         public override bool AlPulsarAtras()
         {
             if (UIUtil.EstaVisible(modalPista)) UIUtil.CerrarModal(modalPista);
+            else if (UIUtil.EstaVisible(modalSalir)) UIUtil.CerrarModal(modalSalir, Reanudar);
             else if (UIUtil.EstaVisible(modalPausa)) CerrarPausa();
             else if (!terminado) AbrirPausa();
             return true;
@@ -182,16 +198,16 @@ namespace Mindlock.UI
             // Encabezado
             if (EsDiario)
             {
-                lblNivel.text = "Acertijo del día";
+                lblNivel.text = Idioma.T("Acertijo del día");
                 lblSubtitulo.text = Formato.Puntos(nivel.PuntajeBase) + " + bonus";
                 lblBannerFecha.text = Formato.Fecha(DateTime.Today);
                 int racha = Servicios.Diario.RachaActual(jugador.Id);
-                lblBannerRacha.text = racha > 0 ? Formato.Racha(racha) : "Empieza tu racha hoy";
+                lblBannerRacha.text = racha > 0 ? Formato.Racha(racha) : Idioma.T("Empieza tu racha hoy");
                 lblBannerBonus.text = "+" + Reglas.BonusDiario + " pts";
             }
             else
             {
-                lblNivel.text = "Nivel " + nivel.Numero;
+                lblNivel.text = Idioma.F("Nivel {0}", nivel.Numero);
                 lblSubtitulo.text = Formato.Puntos(nivel.PuntajeBase) + " base";
             }
             UIUtil.Mostrar(bannerDiario, EsDiario);
@@ -200,7 +216,7 @@ namespace Mindlock.UI
             UIUtil.Etiqueta(etqCategoria, Formato.NombreCategoria(acertijo.Categoria), Formato.Clave(acertijo.Categoria));
 
             // Enunciado y respuesta
-            lblEnunciado.text = acertijo.Enunciado;
+            lblEnunciado.text = acertijo.EnunciadoVisible;
             tarjetaEnunciado.RemoveFromClassList("tarjeta-enunciado--correcta");
             pistasVistas.Clear();
             ConstruirRespuesta();
@@ -234,14 +250,14 @@ namespace Mindlock.UI
                     zonaOpciones.Clear();
                     opciones.Clear();
                     opcionElegida = null;
-                    for (int i = 0; i < acertijo.Opciones.Count; i++)
+                    for (int i = 0; i < acertijo.OpcionesVisibles.Count; i++)
                     {
                         var b = UIUtil.Boton(null, "opcion");
                         var letra = UIUtil.Caja("opcion__letra");
                         letra.Add(UIUtil.Texto(((char)('A' + i)).ToString(), "opcion__letra-texto"));
                         b.Add(letra);
-                        b.Add(UIUtil.Texto(acertijo.Opciones[i], "opcion__texto"));
-                        b.userData = acertijo.Opciones[i];
+                        b.Add(UIUtil.Texto(acertijo.OpcionesVisibles[i], "opcion__texto"));
+                        b.userData = acertijo.OpcionesVisibles[i];
                         UIUtil.IgnorarToquesHijos(b);
                         b.clicked += () => ElegirOpcion(b);
                         zonaOpciones.Add(b);
@@ -263,7 +279,7 @@ namespace Mindlock.UI
                         fichaEnCasilla.Add(null);
                         casillasCont.Add(c);
                     }
-                    foreach (var texto in acertijo.Opciones)
+                    foreach (var texto in acertijo.OpcionesVisibles)
                     {
                         var f = UIUtil.Boton(texto, "ficha");
                         f.clicked += () => ColocarFicha(f);
@@ -317,12 +333,30 @@ namespace Mindlock.UI
                 UIUtil.PonerTexto(lblTiempo, Formato.Tiempo(s));
                 indTiempo.RemoveFromClassList("indicador--alerta");
             }
-            UIUtil.PonerTexto(lblIntentos, "Intento " + intentos);
+            UIUtil.PonerTexto(lblIntentos, Idioma.F("Intento {0}", intentos));
             UIUtil.PonerTexto(lblPuntos, Formato.Puntos(PuntajePotencial()));
+        }
+
+        /// <summary>-1 si el nivel no usa vidas (acertijo diario); si no, las vidas que quedan.</summary>
+        int PerderVida()
+        {
+            if (EsDiario || Servicios.Economia == null) return -1;
+            int vidas = Servicios.Economia.PerderVida(jugador.Id);
+            ui.Economia.AvisarCambio();
+            return vidas;
+        }
+
+        /// <summary>Sigue con el mismo acertijo después de conseguir una vida.</summary>
+        void Continuar()
+        {
+            pausado = false;
+            ultimoTick = Time.realtimeSinceStartup;
+            OcultarFranja();
         }
 
         void TiempoAgotado()
         {
+            PerderVida();
             terminado = true;
             reloj.Pause();
             ui.Vibrar();
@@ -398,9 +432,9 @@ namespace Mindlock.UI
         {
             switch (acertijo.Tipo)
             {
-                case TipoRespuesta.Texto: return "Escribe una respuesta";
-                case TipoRespuesta.OpcionMultiple: return "Elige una opción";
-                default: return "Completa todas las casillas";
+                case TipoRespuesta.Texto: return Idioma.T("Escribe una respuesta");
+                case TipoRespuesta.OpcionMultiple: return Idioma.T("Elige una opción");
+                default: return Idioma.T("Completa todas las casillas");
             }
         }
 
@@ -443,7 +477,7 @@ namespace Mindlock.UI
             botonComprobar.SetEnabled(false);
             UIUtil.Ocultar(botonSugerencia);
             tarjetaEnunciado.AddToClassList("tarjeta-enunciado--correcta");
-            MostrarFranja("¡Correcto! Abriendo el candado...", "franja--exito", "candado-abierto");
+            MostrarFranja(Idioma.T("¡Correcto! Abriendo el candado..."), "franja--exito", "candado-abierto");
             Sonidos.Reproducir(Sonido.Correcto);
 
             var intento = new ResultadoIntento
@@ -490,7 +524,16 @@ namespace Mindlock.UI
                 if (!terminado) LimpiarRespuesta();
             }).StartingIn(450);
 
-            MostrarFranja("Casi... inténtalo de nuevo", "franja--error", "candado");
+            // Fuera del acertijo diario, cada respuesta incorrecta cuesta una vida
+            int vidas = PerderVida();
+            if (vidas < 0) MostrarFranja(Idioma.T("Casi... inténtalo de nuevo"), "franja--error", "candado");
+            else if (vidas > 0) MostrarFranja(vidas == 1 ? Idioma.T("Casi... te queda 1 vida") : Idioma.F("Casi... te quedan {0} vidas", vidas), "franja--error", "corazon");
+            else
+            {
+                MostrarFranja(Idioma.T("Te quedaste sin vidas"), "franja--error", "corazon");
+                pausado = true;
+                Raiz.schedule.Execute(() => ui.Economia.AbrirVidas(Continuar, Salir)).StartingIn(700);
+            }
             if (intentos > 3 && PistasRestantesAcertijo > 0 && jugador.PistasDisponibles > 0)
                 UIUtil.Mostrar(botonSugerencia);
 
@@ -518,7 +561,7 @@ namespace Mindlock.UI
 
         void ActualizarBotonPista()
         {
-            lblBotonPista.text = PistasRestantesAcertijo > 0 ? "Pista (" + PistasRestantesAcertijo + ")" : "Pistas";
+            lblBotonPista.text = PistasRestantesAcertijo > 0 ? Idioma.F("Pista ({0})", PistasRestantesAcertijo) : Idioma.T("Pistas");
         }
 
         void PulsarPista()
@@ -527,27 +570,30 @@ namespace Mindlock.UI
 
             if (PistasRestantesAcertijo <= 0)
             {
-                lblSinPistas.text = "Ya usaste todas las pistas de este acertijo";
-                lblSinPistasDetalle.text = "Están debajo del enunciado. ¡Tú puedes!";
+                lblSinPistas.text = Idioma.T("Ya usaste todas las pistas de este acertijo");
+                lblSinPistasDetalle.text = Idioma.T("Están debajo del enunciado. ¡Tú puedes!");
                 MostrarEstadoPista(EstadoPista.SinPistas);
                 return;
             }
             if (jugador.PistasDisponibles <= 0)
             {
-                lblSinPistas.text = "No te quedan pistas disponibles";
-                lblSinPistasDetalle.text = "Gana más resolviendo el acertijo diario o consiguiendo 3 estrellas en un nivel.";
-                MostrarEstadoPista(EstadoPista.SinPistas);
+                lblSinPistas.text = Idioma.T("No te quedan pistas disponibles");
+                bool anuncio = Anuncios.Activos && (Servicios.Economia == null || Servicios.Economia.AnunciosRestantesHoy(jugador.Id) > 0);
+                lblSinPistasDetalle.text = Idioma.T(anuncio
+                    ? "Mira un anuncio, cómprala con monedas, resuelve el acertijo diario o consigue 3 estrellas en un nivel."
+                    : "Cómprala con monedas, resuelve el acertijo diario o consigue 3 estrellas en un nivel.");
+                MostrarEstadoPista(EstadoPista.SinPistas, anuncio, Servicios.Economia != null);
                 return;
             }
 
             if (!Preferencias.ConfirmarPistas) { RevelarPista(); return; }
 
             var pista = acertijo.Pistas[pistasUsadas];
-            lblConfirmarTitulo.text = "¿Usar la pista " + pista.Orden + "?";
-            lblConfirmarTexto.text = "Esta pista resta " + pista.Penalizacion + " puntos al nivel.";
+            lblConfirmarTitulo.text = Idioma.F("¿Usar la pista {0}?", pista.Orden);
+            lblConfirmarTexto.text = Idioma.F("Esta pista resta {0} puntos al nivel.", pista.Penalizacion);
             lblPuntosAntes.text = Formato.Puntos(PuntajePotencial());
             lblPuntosDespues.text = Formato.Puntos(PuntajePotencial(pista.Penalizacion));
-            lblPistasGlobales.text = jugador.PistasDisponibles == 1 ? "Te queda 1 pista" : "Te quedan " + jugador.PistasDisponibles + " pistas";
+            lblPistasGlobales.text = jugador.PistasDisponibles == 1 ? Idioma.T("Te queda 1 pista") : Idioma.F("Te quedan {0} pistas", jugador.PistasDisponibles);
             MostrarEstadoPista(EstadoPista.Confirmar);
         }
 
@@ -556,8 +602,8 @@ namespace Mindlock.UI
             if (terminado || PistasRestantesAcertijo <= 0) return;
             if (!Servicios.Progreso.UsarPista(jugador.Id))
             {
-                lblSinPistas.text = "No te quedan pistas disponibles";
-                lblSinPistasDetalle.text = "Gana más resolviendo el acertijo diario.";
+                lblSinPistas.text = Idioma.T("No te quedan pistas disponibles");
+                lblSinPistasDetalle.text = Idioma.T("Gana más resolviendo el acertijo diario.");
                 MostrarEstadoPista(EstadoPista.SinPistas);
                 return;
             }
@@ -568,7 +614,7 @@ namespace Mindlock.UI
 
             var vista = UIUtil.Caja("pista-vista");
             vista.Add(Iconos.Crear("bombilla", "ico-sm"));
-            vista.Add(UIUtil.Texto("Pista " + pista.Orden + ": " + pista.Texto, "pista-vista__texto"));
+            vista.Add(UIUtil.Texto(Idioma.F("Pista {0}: {1}", pista.Orden, pista.TextoVisible), "pista-vista__texto"));
             pistasVistas.Add(vista);
             Sonidos.Reproducir(Sonido.Pista);
 
@@ -590,8 +636,8 @@ namespace Mindlock.UI
                 fila.Add(Iconos.Crear(vista ? "bombilla" : "candado", "ico-md", vista ? "color-acento" : "color-sec"));
 
                 var textos = UIUtil.Caja("crecer", "ml-sm");
-                textos.Add(UIUtil.Texto("Pista " + pista.Orden, "pista-item__titulo"));
-                if (vista) textos.Add(UIUtil.Texto(pista.Texto, "pista-item__texto"));
+                textos.Add(UIUtil.Texto(Idioma.F("Pista {0}", pista.Orden), "pista-item__titulo"));
+                if (vista) textos.Add(UIUtil.Texto(pista.TextoVisible, "pista-item__texto"));
                 fila.Add(textos);
 
                 if (!vista) fila.Add(UIUtil.Texto("-" + pista.Penalizacion + " pts", "texto-sec"));
@@ -599,8 +645,42 @@ namespace Mindlock.UI
             }
         }
 
-        void MostrarEstadoPista(EstadoPista estado)
+        /// <summary>El reloj se detiene mientras dura el anuncio; con la recompensa se abre la confirmación de la pista.</summary>
+        void VerAnuncioPorPista()
         {
+            if (terminado) return;
+            pausado = true;
+            UIUtil.CerrarModal(modalPista, () => Anuncios.MostrarRecompensa(Idioma.T("1 pista"), vioCompleto =>
+            {
+                pausado = false;
+                ultimoTick = Time.realtimeSinceStartup;
+                if (terminado) return;
+                bool gano = Servicios.Economia != null
+                    ? Servicios.Economia.Recompensar(jugador.Id, Recompensa.Pista)
+                    : Servicios.Progreso.GanarPista(jugador.Id);
+                if (gano)
+                {
+                    ui.MostrarAviso(Idioma.T("¡Ganaste 1 pista!"), "bombilla");
+                    ui.Economia.AvisarCambio();
+                    PulsarPista();
+                }
+            }));
+        }
+
+        void ComprarPista()
+        {
+            if (terminado || Servicios.Economia == null) return;
+            if (!Servicios.Economia.ComprarPista(jugador.Id)) return;
+            ui.MostrarAviso(Idioma.T("¡Compraste 1 pista!"), "bombilla");
+            ui.Economia.AvisarCambio();
+            UIUtil.CerrarModal(modalPista, PulsarPista);
+        }
+
+        void MostrarEstadoPista(EstadoPista estado, bool ofrecerAnuncio = false, bool ofrecerCompra = false)
+        {
+            UIUtil.Mostrar(botonVerAnuncio, ofrecerAnuncio);
+            UIUtil.Mostrar(botonComprarPista, ofrecerCompra);
+            botonComprarPista.SetEnabled(ofrecerCompra && jugador.Monedas >= Economia.PrecioPista);
             UIUtil.Mostrar(estadoConfirmar, estado == EstadoPista.Confirmar);
             UIUtil.Mostrar(estadoLista, estado == EstadoPista.Lista);
             UIUtil.Mostrar(estadoSinPistas, estado == EstadoPista.SinPistas);
@@ -615,14 +695,47 @@ namespace Mindlock.UI
         {
             if (terminado) return;
             pausado = true;
+            lblAvisoSalir.text = UsaVidas ? Idioma.T("Si sales, pierdes 1 vida.") : Idioma.T("Perderás el avance de este intento.");
             UIUtil.AbrirModal(modalPausa);
         }
 
         void CerrarPausa()
         {
+            UIUtil.CerrarModal(modalPausa, Reanudar);
+        }
+
+        void Reanudar()
+        {
             pausado = false;
             ultimoTick = Time.realtimeSinceStartup;
-            UIUtil.CerrarModal(modalPausa);
+        }
+
+        /// <summary>El acertijo diario no usa vidas: ahí salir solo pierde el intento.</summary>
+        bool UsaVidas { get { return !EsDiario && Servicios.Economia != null; } }
+
+        /// <summary>Antes de volver al mapa pregunta si está seguro; el reloj sigue en pausa.</summary>
+        void PreguntarSalir()
+        {
+            if (terminado) { Salir(); return; }
+            pausado = true;
+            if (UsaVidas)
+            {
+                int quedan = Mathf.Max(0, jugador.Vidas - 1);
+                lblSalirTexto.text = Idioma.T("Si sales ahora perderás 1 vida y el avance de este intento.");
+                lblSalirVidas.text = quedan == 1 ? Idioma.T("Te quedará 1 vida") : Idioma.F("Te quedarán {0} vidas", quedan);
+            }
+            else lblSalirTexto.text = Idioma.T("Si sales ahora perderás el avance de este intento.");
+            UIUtil.Mostrar(lblSalirVidas, UsaVidas);
+            Iconos.Cambiar(icoSalir, UsaVidas ? "corazon" : "candado");
+            UIUtil.AbrirModal(modalSalir);
+        }
+
+        void ConfirmarSalir()
+        {
+            terminado = true;
+            reloj.Pause();
+            PerderVida();
+            UIUtil.CerrarModal(modalSalir, Salir);
         }
 
         void Salir()

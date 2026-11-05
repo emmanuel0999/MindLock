@@ -1,0 +1,1 @@
+C:\Universidad\Octubre\Mindlock\Library\Bee\Android\Prj\IL2CPP\Gradle\unityLibrary\build\intermediates\cxx\RelWithDebInfo\4r2x5n5g\obj\armeabi-v7a

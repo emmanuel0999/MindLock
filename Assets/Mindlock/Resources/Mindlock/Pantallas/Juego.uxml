@@ -104,7 +104,23 @@
                     <ui:Label text="Reiniciar nivel" class="boton__texto" picking-mode="Ignore" />
                 </ui:Button>
                 <ui:Button name="botonSalir" text="Volver al mapa" class="boton-texto boton-texto--peligro mt-sm" />
-                <ui:Label text="Perderás el avance de este intento." class="texto-pequeno centrar-texto" />
+                <ui:Label name="lblAvisoSalir" text="Perderás el avance de este intento." class="texto-pequeno centrar-texto" />
+            </ui:VisualElement>
+        </ui:VisualElement>
+
+        <!-- MODAL: confirmar salida (fuera del acertijo diario cuesta una vida) -->
+        <ui:VisualElement name="modalSalir" class="modal-fondo oculto">
+            <ui:VisualElement class="modal">
+                <ui:VisualElement class="modal__icono modal__icono--error">
+                    <ui:VisualElement name="icoSalir" class="ico ico-corazon ico-lg color-error" />
+                </ui:VisualElement>
+                <ui:Label text="¿Seguro que quieres salir?" class="encabezado centrar-texto mt-md" />
+                <ui:Label name="lblSalirTexto" text="Si sales ahora perderás 1 vida y el avance de este intento." class="texto-sec centrar-texto mt-xs" />
+                <ui:Label name="lblSalirVidas" text="Te quedarán 3 vidas" class="texto-pequeno centrar-texto mt-sm" />
+                <ui:VisualElement class="fila mt-lg">
+                    <ui:Button name="botonQuedarme" text="Seguir jugando" class="boton boton-suave boton--largo crecer mr-sm" />
+                    <ui:Button name="botonConfirmarSalir" text="Salir" class="boton boton-peligro boton--largo crecer ml-sm" />
+                </ui:VisualElement>
             </ui:VisualElement>
         </ui:VisualElement>
 
@@ -145,7 +161,15 @@
                     </ui:VisualElement>
                     <ui:Label name="lblSinPistas" text="No te quedan pistas disponibles" class="encabezado centrar-texto mt-md" />
                     <ui:Label name="lblSinPistasDetalle" text="Resuelve el acertijo diario para ganar más." class="texto-sec centrar-texto mt-xs" />
-                    <ui:Button name="botonEntendido" text="Entendido" class="boton boton-principal mt-lg" />
+                    <ui:Button name="botonVerAnuncio" class="boton boton-acento boton--largo anuncio__accion">
+                        <ui:VisualElement class="ico ico-bombilla ico-sm color-sobre-acento mr-xs" picking-mode="Ignore" />
+                        <ui:Label text="Ver anuncio: +1 pista" class="boton__texto" picking-mode="Ignore" />
+                    </ui:Button>
+                    <ui:Button name="botonComprarPista" class="boton boton-secundario boton--largo anuncio__siguiente">
+                        <ui:VisualElement class="ico ico-moneda ico-sm mr-xs" picking-mode="Ignore" />
+                        <ui:Label name="lblComprarPista" text="Comprar pista: 50 monedas" class="boton__texto" picking-mode="Ignore" />
+                    </ui:Button>
+                    <ui:Button name="botonEntendido" text="Entendido" class="boton boton-principal anuncio__siguiente" />
                 </ui:VisualElement>
 
             </ui:VisualElement>

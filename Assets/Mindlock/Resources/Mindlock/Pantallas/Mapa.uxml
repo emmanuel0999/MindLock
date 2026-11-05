@@ -29,6 +29,21 @@
             </ui:VisualElement>
         </ui:VisualElement>
 
+        <!-- Vidas y monedas (abren la ventana de vidas y la tienda) -->
+        <ui:VisualElement class="fila mt-sm">
+            <ui:Button name="chipVidas" class="chip chip--boton crecer mr-xs">
+                <ui:VisualElement class="ico ico-corazon ico--relleno ico-sm color-error" picking-mode="Ignore" />
+                <ui:Label name="lblVidas" text="4" class="chip__texto" picking-mode="Ignore" />
+                <ui:Label name="lblVidasTiempo" text="Llenas" class="texto-pequeno ml-sm crecer texto-una-linea" picking-mode="Ignore" />
+            </ui:Button>
+            <ui:Button name="chipMonedas" class="chip chip--boton crecer ml-xs">
+                <ui:VisualElement class="ico ico-moneda ico-sm color-acento" picking-mode="Ignore" />
+                <ui:Label name="lblMonedas" text="0" class="chip__texto" picking-mode="Ignore" />
+                <ui:Label text="Tienda" class="texto-pequeno ml-sm crecer" picking-mode="Ignore" />
+                <ui:VisualElement class="ico ico-mas ico-sm color-accion" picking-mode="Ignore" />
+            </ui:Button>
+        </ui:VisualElement>
+
         <ui:ScrollView name="scrollMapa" class="crecer mt-md">
 
             <!-- Tarjeta del acertijo diario -->

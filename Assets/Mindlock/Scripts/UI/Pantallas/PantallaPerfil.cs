@@ -29,7 +29,7 @@ namespace Mindlock.UI
             Boton("botonConfirmarCrear", Crear);
 
             campoNombre.maxLength = Reglas.MaxLargoNombre;
-            UIUtil.Placeholder(campoNombre, "Ej. Ana");
+            UIUtil.Placeholder(campoNombre, Idioma.T("Ej. Ana"));
             campoNombre.RegisterValueChangedCallback(_ =>
             {
                 ActualizarContador();
@@ -109,9 +109,9 @@ namespace Mindlock.UI
             if (!UIUtil.EstaVisible(modalCrear)) return;
             string nombre = (campoNombre.value ?? string.Empty).Trim();
 
-            if (nombre.Length == 0) { MostrarError("Escribe un nombre"); return; }
-            if (nombre.Length > Reglas.MaxLargoNombre) { MostrarError("Máximo " + Reglas.MaxLargoNombre + " caracteres"); return; }
-            if (Servicios.Perfiles.ExisteNombre(nombre)) { MostrarError("Ya existe un perfil con ese nombre"); return; }
+            if (nombre.Length == 0) { MostrarError(Idioma.T("Escribe un nombre")); return; }
+            if (nombre.Length > Reglas.MaxLargoNombre) { MostrarError(Idioma.F("Máximo {0} caracteres", Reglas.MaxLargoNombre)); return; }
+            if (Servicios.Perfiles.ExisteNombre(nombre)) { MostrarError(Idioma.T("Ya existe un perfil con ese nombre")); return; }
 
             var jugador = Servicios.Perfiles.CrearPerfil(nombre);
             UIUtil.CerrarModal(modalCrear, () => Entrar(jugador));

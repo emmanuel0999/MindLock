@@ -47,11 +47,11 @@ namespace Mindlock.UI
             // Estadísticas
             int completados = Servicios.Progreso.NivelesCompletados(j.Id);
             gridEstadisticas.Clear();
-            gridEstadisticas.Add(Estadistica("trofeo", "color-acento", Formato.Numero(j.PuntajeTotal), "Puntaje total"));
-            gridEstadisticas.Add(Estadistica("estrella", "color-acento", Servicios.Progreso.EstrellasTotales(j.Id) + "/" + (Reglas.TotalNiveles * Reglas.MaxEstrellas), "Estrellas"));
-            gridEstadisticas.Add(Estadistica("candado-abierto", "color-accion", completados + "/" + Reglas.TotalNiveles, "Niveles completados"));
+            gridEstadisticas.Add(Estadistica("trofeo", "color-acento", Formato.Numero(j.PuntajeTotal), Idioma.T("Puntaje total")));
+            gridEstadisticas.Add(Estadistica("estrella", "color-acento", Servicios.Progreso.EstrellasTotales(j.Id) + "/" + (Reglas.TotalNiveles * Reglas.MaxEstrellas), Idioma.T("Estrellas")));
+            gridEstadisticas.Add(Estadistica("candado-abierto", "color-accion", completados + "/" + Reglas.TotalNiveles, Idioma.T("Niveles completados")));
             int racha = Servicios.Diario.RachaActual(j.Id);
-            gridEstadisticas.Add(Estadistica("llama", "color-llama", racha.ToString(), racha == 1 ? "Día de racha" : "Días de racha"));
+            gridEstadisticas.Add(Estadistica("llama", "color-llama", racha.ToString(), Idioma.T(racha == 1 ? "Día de racha" : "Días de racha")));
 
             // Avance por dificultad
             listaDificultades.Clear();
@@ -79,7 +79,7 @@ namespace Mindlock.UI
             var logros = Servicios.Logros.ObtenerLogros(j.Id);
             int obtenidos = 0;
             foreach (var l in logros) if (l.Obtenido) obtenidos++;
-            lblContador.text = obtenidos + " de " + logros.Count + " logros obtenidos";
+            lblContador.text = Idioma.F("{0} de {1} logros obtenidos", obtenidos, logros.Count);
             barraLogros.style.width = Length.Percent(logros.Count == 0 ? 0f : 100f * obtenidos / logros.Count);
 
             gridLogros.Clear();
@@ -117,12 +117,12 @@ namespace Mindlock.UI
                 circulo.Add(cand);
             }
             b.Add(circulo);
-            b.Add(UIUtil.Texto(l.Logro.Nombre, "insignia__nombre"));
+            b.Add(UIUtil.Texto(l.Logro.NombreVisible, "insignia__nombre"));
 
             string detalle;
             if (l.Obtenido && l.Fecha.HasValue) detalle = Formato.FechaCorta(l.Fecha.Value);
             else if (l.Logro.Meta > 1) detalle = l.Progreso + "/" + l.Logro.Meta;
-            else detalle = "Pendiente";
+            else detalle = Idioma.T("Pendiente");
             b.Add(UIUtil.Texto(detalle, "insignia__detalle"));
 
             UIUtil.IgnorarToquesHijos(b);
@@ -138,19 +138,19 @@ namespace Mindlock.UI
             hojaIcono.EnableInClassList("color-tenue", !l.Obtenido);
             hojaInsignia.EnableInClassList("insignia__circulo--pendiente", !l.Obtenido);
 
-            lblHojaNombre.text = l.Logro.Nombre;
-            lblHojaDescripcion.text = l.Logro.Descripcion;
+            lblHojaNombre.text = l.Logro.NombreVisible;
+            lblHojaDescripcion.text = l.Logro.DescripcionVisible;
 
             if (l.Obtenido)
             {
-                lblHojaEstado.text = l.Fecha.HasValue ? "Obtenido el " + Formato.FechaCorta(l.Fecha.Value) : "Obtenido";
+                lblHojaEstado.text = l.Fecha.HasValue ? Idioma.F("Obtenido el {0}", Formato.FechaCorta(l.Fecha.Value)) : Idioma.T("Obtenido");
                 lblHojaEstado.EnableInClassList("pastilla--exito", true);
                 lblHojaEstado.EnableInClassList("pastilla--suave", false);
                 UIUtil.Ocultar(barraHojaCont);
             }
             else
             {
-                lblHojaEstado.text = "Progreso: " + l.Progreso + " de " + l.Logro.Meta;
+                lblHojaEstado.text = Idioma.F("Progreso: {0} de {1}", l.Progreso, l.Logro.Meta);
                 lblHojaEstado.EnableInClassList("pastilla--exito", false);
                 lblHojaEstado.EnableInClassList("pastilla--suave", true);
                 UIUtil.Mostrar(barraHojaCont, l.Logro.Meta > 1);

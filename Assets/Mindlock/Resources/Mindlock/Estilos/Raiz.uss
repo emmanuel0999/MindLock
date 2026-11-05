@@ -68,3 +68,195 @@
     justify-content: center;
     flex-shrink: 0;
 }
+
+/* ---------- Marco: pantalla completa y app centrada en pantallas anchas ---------- */
+
+.marco {
+    flex-grow: 1;
+    align-items: center;
+    background-color: var(--color-fondo);
+}
+
+.app {
+    width: 100%;
+    max-width: 600px;
+}
+
+/* Cuando sobra espacio a los lados (tableta horizontal, PC), la app se ve como una columna */
+.app--columna {
+    border-left-width: 1px;
+    border-right-width: 1px;
+    border-color: var(--color-borde);
+}
+
+/* ---------- Banner de anuncio ---------- */
+
+.banner {
+    flex-direction: row;
+    align-items: center;
+    flex-shrink: 0;
+    height: 60px;
+    margin: 0;
+    padding: 0 16px;
+    border-width: 0;
+    border-top-width: 1px;
+    border-radius: 0;
+    border-color: var(--color-borde);
+    background-color: var(--color-superficie);
+    opacity: 1;
+    transition-property: opacity;
+    transition-duration: 0.3s;
+}
+
+.banner--cambiando { opacity: 0; }
+
+.banner__icono {
+    width: 40px;
+    height: 40px;
+    border-radius: 12px;
+    background-color: var(--color-acento-suave);
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.banner__etiqueta {
+    padding: 1px 6px;
+    border-radius: 6px;
+    font-size: 10px;
+    -unity-font-style: bold;
+    color: var(--color-texto-sec);
+    background-color: var(--color-superficie-2);
+    flex-shrink: 0;
+}
+
+.banner__titulo {
+    flex-shrink: 1;
+    font-size: var(--fuente-sm);
+    -unity-font-style: bold;
+    color: var(--color-texto);
+}
+
+.banner__texto {
+    margin-top: 2px;
+    font-size: var(--fuente-xs);
+    color: var(--color-texto-sec);
+}
+
+/* ---------- Anuncio a pantalla completa ---------- */
+
+.anuncio__imagen {
+    height: 150px;
+    border-radius: 16px;
+    background-color: var(--color-acento-suave);
+    align-items: center;
+    justify-content: center;
+}
+
+.anuncio__barra {
+    transition-duration: 0.1s, 0.2s;
+}
+
+/* .boton pone margin: 0, así que el espacio va con un selector más específico */
+.modal .anuncio__accion { margin-top: 24px; }
+.modal .anuncio__siguiente { margin-top: 8px; }
+
+/* El banner nativo de LevelPlay se dibuja encima: aquí solo se reserva su lugar */
+.banner--nativo {
+    height: 50px;
+    padding: 0;
+    border-top-width: 0;
+    background-color: var(--color-fondo);
+}
+
+/* ---------- Vidas y tienda ---------- */
+
+.corazon { margin: 0 4px; }
+
+.tienda__item {
+    flex-direction: row;
+    align-items: center;
+    margin: 0;
+    padding: 12px 14px;
+    border-width: 1px;
+    border-radius: 14px;
+    border-color: var(--color-borde);
+    background-color: var(--color-superficie-2);
+    color: var(--color-texto);
+}
+
+.modal .tienda__item.mt-md { margin-top: 16px; }
+.modal .tienda__item.mt-sm { margin-top: 8px; }
+
+.tienda__item:disabled { opacity: 0.5; }
+
+.tienda__precio {
+    font-size: var(--fuente-md);
+    -unity-font-style: bold;
+    color: var(--color-acento);
+}
+
+/* Contadores de vidas y monedas del mapa */
+.chip--boton {
+    margin: 0;
+    padding: 8px 12px;
+    border-radius: 14px;
+    color: var(--color-texto);
+}
+
+.chip--boton:active { opacity: 0.8; }
+
+/* Botón "Duplicar" dentro del aviso de monedas del resultado */
+.boton-duplicar {
+    margin: 0 0 0 10px;
+    padding: 8px 18px;
+    min-height: 38px;
+    flex-shrink: 0;
+    align-items: center;
+    justify-content: center;
+    border-width: 0;
+    border-radius: 100px;
+    background-color: var(--color-acento);
+}
+
+.boton-duplicar__texto {
+    margin: 0;
+    padding: 0;
+    -unity-text-align: middle-center;
+    white-space: nowrap;
+    font-size: var(--fuente-xs);
+    -unity-font-style: bold;
+    color: var(--color-sobre-acento);
+}
+
+/* Aviso de monedas del resultado, debajo del puntaje */
+.aviso-monedas { align-self: stretch; }
+
+/* Botones de vidas, monedas y anuncios: si el texto no cabe, pasa a dos líneas dentro del botón */
+.boton--largo {
+    padding: 8px 16px;
+}
+
+.boton--largo .boton__texto {
+    white-space: normal;
+    flex-shrink: 1;
+    -unity-text-align: middle-center;
+}
+
+.boton--largo .ico {
+    flex-shrink: 0;
+}
+
+/* Resultado: el aviso de monedas puede ocupar dos líneas */
+.aviso-monedas .aviso__texto {
+    white-space: normal;
+}
+
+/* Resultado: "Repetir" y "Volver al mapa" reparten el ancho; el mapa lleva el texto más largo */
+.resultado-botones > .boton {
+    flex-basis: 0;
+}
+
+.resultado-botones > .resultado-mapa {
+    flex-grow: 1.4;
+}

@@ -15,6 +15,7 @@ namespace Mindlock.UI
         IVisualElementScheduledItem cuenta;
 
         static readonly string[] LetrasDias = { "L", "M", "X", "J", "V", "S", "D" };
+        static readonly string[] LetrasDiasEn = { "M", "T", "W", "T", "F", "S", "S" };
 
         protected override void Configurar()
         {
@@ -46,9 +47,14 @@ namespace Mindlock.UI
             if (j == null) { ui.IrA(PantallaId.Perfil); return; }
 
             var resultado = datos as ResultadoNivel;
+            if (resultado != null && resultado.MonedasGanadas > 0)
+            {
+                ui.MostrarAviso(Idioma.F("+{0} monedas", resultado.MonedasGanadas), "moneda");
+                ui.Economia.AvisarCambio();
+            }
             var diario = Servicios.Diario.ObtenerDiario(DateTime.Today);
             lblFecha.text = Formato.Fecha(diario.Fecha);
-            lblCategoria.text = "Categoría: " + Formato.NombreCategoria(diario.Acertijo.Categoria);
+            lblCategoria.text = Idioma.F("Categoría: {0}", Formato.NombreCategoria(diario.Acertijo.Categoria));
             lblBonus.text = "+" + diario.PuntosBonus + " pts";
 
             bool resuelto = Servicios.Diario.ResueltoHoy(j.Id);
@@ -61,13 +67,13 @@ namespace Mindlock.UI
             if (!resuelto)
             {
                 UIUtil.Mostrar(avisoRachaPerdida, perdida);
-                lblRachaPendiente.text = racha > 0 ? Formato.Racha(racha) : "Empieza tu racha hoy";
+                lblRachaPendiente.text = racha > 0 ? Formato.Racha(racha) : Idioma.T("Empieza tu racha hoy");
             }
             else
             {
                 lblResueltoTitulo.text = resultado != null
-                    ? "¡Resuelto! +" + Formato.Numero(resultado.Puntaje) + " pts"
-                    : "¡Ya resolviste el de hoy!";
+                    ? Idioma.F("¡Resuelto! +{0} pts", Formato.Numero(resultado.Puntaje))
+                    : Idioma.T("¡Ya resolviste el de hoy!");
 
                 if (resultado != null && racha > 1)
                 {
@@ -105,7 +111,7 @@ namespace Mindlock.UI
             for (int i = 0; i < 7; i++)
             {
                 var dia = UIUtil.Caja("dia");
-                dia.Add(UIUtil.Texto(LetrasDias[i], "dia__letra"));
+                dia.Add(UIUtil.Texto((Idioma.EsIngles ? LetrasDiasEn : LetrasDias)[i], "dia__letra"));
                 var circulo = UIUtil.Caja("dia__circulo");
                 if (dias[i])
                 {
